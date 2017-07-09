@@ -2,15 +2,18 @@
 #include <codex/function.hpp>
 
 TEST(create , function) {
+	// U&&
 	codex::function< int() > func([]()->int {
 		return 32;
 	});
 	ASSERT_EQ(func(), 32);
 
+	// const function
 	codex::function< int() > func_assigned(func);
 
 	ASSERT_EQ(func(), func_assigned());
 
+	// function&&
 	func_assigned = std::move(func);
 
 	ASSERT_NE(func(), func_assigned());
@@ -18,6 +21,7 @@ TEST(create , function) {
 	const auto f0 = []() -> int {
 		return 42;
 	};
+	// const U&
 	codex::function< int() > func_from_const_u(f0);
 	ASSERT_EQ(func_from_const_u(), 42);
 }
@@ -56,6 +60,14 @@ TEST(assign0, function) {
 
 	ASSERT_EQ(func2(1), 1.1);
 
+}
+
+TEST(swap, function) {
+	auto fa = codex::function<int()>([]()->int {return 1; });
+	auto fb = codex::function<int()>([]()->int {return 2; });
+	fa.swap(fb);
+	ASSERT_EQ(fa(), 2);
+	ASSERT_EQ(fb(), 1);
 }
 
 TEST(callable, function) {

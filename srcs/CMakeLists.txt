@@ -36,11 +36,13 @@ set( HEADERS
     include/codex/codex.hpp
     include/codex/function.hpp
     include/codex/function.ipp
+	include/codex/error_code.hpp
     ${PLATFORM_DEPEND_HEADERS}
 )
 
 set( SRCS
     codex.cpp
+	error_code.cpp
     ${PLATFORM_DEPEND_SRCS}
     )
 

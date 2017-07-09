@@ -61,6 +61,8 @@ endif()
 add_executable( codex.tests
   test_hello.cpp
   test_function.cpp
+  test_container_of.cpp
+  test_error.cpp
   ${PLATFORM_DEPEND_SRCS}
 )
 
