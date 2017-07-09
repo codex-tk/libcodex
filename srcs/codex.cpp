@@ -1,4 +1,4 @@
-#include <codex\codex.hpp>
+#include <codex/codex.hpp>
 
 namespace codex {
   int universe( void ) {
