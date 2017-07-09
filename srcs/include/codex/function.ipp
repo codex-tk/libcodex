@@ -42,6 +42,58 @@ namespace codex{
 	{
 
 	}
+	
+	template < typename R, typename ...Args >
+	template < typename U >
+	function< R(Args...)>::function(const U& func) 
+		: _callable(callable< R(Args...)>::make_callable(func))
+	{
+
+	}
+	template < typename R, typename ...Args >
+	function< R(Args ...)>::function(const function< R(Args ...)>& rhs)
+		: _callable(rhs._callable)
+	{
+
+	}
+
+	template < typename R, typename ...Args >
+	function< R(Args ...)>::function(function< R(Args ...)>&& rhs)
+		: _callable(std::move(rhs._callable))
+	{
+
+	}
+
+	
+	template < typename R, typename ...Args >
+	template < typename U >
+	function< R(Args ...)>& function< R(Args ...)>::operator=(const U& rhs) {
+		_callable = callable< R(Args...)>::make_callable(rhs);
+		return *this;
+	}
+	
+
+	template < typename R, typename ...Args >
+	template < typename U >
+	function< R(Args ...)>& function< R(Args ...)>::operator=(U&& rhs) {
+		_callable = callable< R(Args...)>::make_callable(std::forward<U>(rhs));
+		return *this;
+	}
+
+
+	template < typename R, typename ...Args > 
+	function< R(Args ...)>& 
+		function< R(Args ...)>::operator=(const function< R(Args ...)>& rhs) {
+		_callable = rhs._callable;
+		return *this;
+	}
+
+	template < typename R, typename ...Args >
+	function< R(Args ...)>&
+		function< R(Args ...)>::operator=(function< R(Args ...)>&& rhs) {
+		_callable = std::move(rhs._callable);
+		return *this;
+	}
 
 
 	template < typename R, typename ...Args >
@@ -51,4 +103,5 @@ namespace codex{
 			return (*_callable)( std::forward<Args>(args)...);
 		return R();
 	}
+
 }
