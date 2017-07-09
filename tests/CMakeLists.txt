@@ -1,6 +1,6 @@
 project( codex.tests )
 
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/../codex/include )
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/../srcs/include )
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/../googletest/googletest/include )
 
 link_directories( ${codex.workspace_BINARY_DIR}/codex )
@@ -60,6 +60,7 @@ endif()
 
 add_executable( codex.tests
   test_hello.cpp
+  test_function.cpp
   ${PLATFORM_DEPEND_SRCS}
 )
 

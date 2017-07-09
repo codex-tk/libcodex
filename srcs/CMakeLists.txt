@@ -34,6 +34,8 @@ endif()
 
 set( HEADERS
     include/codex/codex.hpp
+    include/codex/function.hpp
+    include/codex/function.ipp
     ${PLATFORM_DEPEND_HEADERS}
 )
 
