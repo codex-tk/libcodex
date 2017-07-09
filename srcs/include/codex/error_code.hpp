@@ -27,8 +27,16 @@ namespace codex {
 
 	const std::error_category& category(void);
 
+	/*!
+	@brief ADL Lookup 으로 std 에서 해당 함수를 찾아서 사용
+	codex::errc 와 동일한 네임스페이스에 존재해야한다.
+	*/
 	std::error_code make_error_code(codex::errc ec);
 
+	/*!
+	@brief ADL Lookup 으로 std 에서 해당 함수를 찾아서 사용
+	codex::errc 와 동일한 네임스페이스에 존재해야한다.
+	*/
 	std::error_condition make_error_condition(codex::errc ec);
 
 	std::error_code last_error(void);
@@ -36,7 +44,10 @@ namespace codex {
 }
 
 namespace std {
-	//  template <> struct is_error_code_enum< codex::errc > : public true_type{};
+	/*!
+		
+	*/
+	//template <> struct is_error_code_enum< codex::errc > : public true_type{};
 	template <> struct is_error_condition_enum< codex::errc > : public true_type {};
 }
 

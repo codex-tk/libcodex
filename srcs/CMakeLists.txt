@@ -37,12 +37,19 @@ set( HEADERS
     include/codex/function.hpp
     include/codex/function.ipp
 	include/codex/error_code.hpp
+	include/codex/conv/base64.hpp
+	include/codex/conv/checksum.hpp
+	include/codex/conv/crc32.hpp
+	include/codex/conv/string.hpp
     ${PLATFORM_DEPEND_HEADERS}
 )
 
 set( SRCS
     codex.cpp
 	error_code.cpp
+	conv/base64.cpp
+	conv/crc32.cpp
+	conv/string.cpp
     ${PLATFORM_DEPEND_SRCS}
     )
 

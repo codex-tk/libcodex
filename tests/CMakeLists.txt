@@ -63,13 +63,14 @@ add_executable( codex.tests
   test_function.cpp
   test_container_of.cpp
   test_error.cpp
+  test_conv.cpp
+  test_main.cpp
   ${PLATFORM_DEPEND_SRCS}
 )
 
 target_link_libraries( codex.tests
  codex
  gtest
- gtest_main
 #[[
  ${Boost_LIBRARIES}
 ]]
