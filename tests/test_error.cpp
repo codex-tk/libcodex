@@ -12,7 +12,7 @@ TEST(diag, error) {
 		template <> struct is_error_condition_enum< codex::errc > : public true_type {};
 	}
 	*/
-	// ¼±¾ð½Ã codex::errc->error_condtion À¸·Î º¯È¯ ¼öÇà
+	// ì„ ì–¸ì‹œ codex::errc->error_condtion ìœ¼ë¡œ ë³€í™˜ ìˆ˜í–‰
 	ASSERT_EQ(ec, codex::errc::fail);
 	ASSERT_NE(ec, codex::errc::success);
 }
@@ -22,11 +22,11 @@ TEST(diag, error_condition) {
 		codex::errc::invalid_argument);
 	std::error_condition ec2 = codex::make_error_condition(codex::errc::invalid_argument);
 
-	// ==( std::error_code , std::error_condition ) 
+	// ==( std::error_code , std::error_condition )
 	ASSERT_EQ(ec, ec2);
-	// ==( std::error_code , std::error_condition ) 
+	// ==( std::error_code , std::error_condition )
 	// std::errc->std:error_condition
 	ASSERT_EQ(ec, std::errc::invalid_argument);
-	// ==( std::error_condition , std::error_code ) 
+	// ==( std::error_condition , std::error_code )
 	ASSERT_EQ(ec2, std::make_error_code(std::errc::invalid_argument));
 }
