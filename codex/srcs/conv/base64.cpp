@@ -79,7 +79,7 @@ namespace detail{
     auto e = src.end();
     while (b != e) {
       if (*b == '=') break;
-      bits = (bits << 6) | detail::b64dec_map[*b];
+      bits = (bits << 6) | detail::b64dec_map[static_cast<int>(*b)];
       bit_remain += 6;
       while (bit_remain >= 8) {
         bit_remain -= 8;

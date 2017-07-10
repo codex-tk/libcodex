@@ -28,5 +28,5 @@ else()
 endif()
 
 add_subdirectory( googletest )
-add_subdirectory( srcs )
+add_subdirectory( codex )
 add_subdirectory( tests )
