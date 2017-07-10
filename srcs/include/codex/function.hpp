@@ -6,23 +6,23 @@
 namespace codex {
 
 	/*!
-		@brief lambda , function_ptr µî È£Ãâ °¡´É °´Ã¼ wrapper ÀÇ ¼±¾ğ
-		@detail ÅÛÇÃ¸´ Æ¯¼öÈ­¸¦ ÀÌ¿ëÇÏ¿© function< R () > ÇüÅÂ·Î Ã³¸®ÇÑ´Ù.
+		@brief lambda , function_ptr ë“± í˜¸ì¶œ ê°€ëŠ¥ ê°ì²´ wrapper ì˜ ì„ ì–¸
+		@detail í…œí”Œë¦¿ íŠ¹ìˆ˜í™”ë¥¼ ì´ìš©í•˜ì—¬ function< R () > í˜•íƒœë¡œ ì²˜ë¦¬í•œë‹¤.
 	*/
 	template < typename Signature >
 	class function;
 
 	/*!
-		@brief È£Ãâ °¡´É °´Ã¼ÀÇ ÀÎÅÍÆäÀÌ½º ¼±¾ğ
-		@detail function<R () > ¼±¾ğ½Ã ½ÇÁ¦ Å¸ÀÔ Ãß·ĞÀÌ ºÒ°¡´ÉÇÏ¹Ç·Î
-		¹ÙÀÎµù½Ã callable ÀÇ concrete class ¿¡ ¹ÙÀÎµù µÇ°í function Àº
-		callable À» °¡Áöµµ·Ï ±¸¼º
+		@brief í˜¸ì¶œ ê°€ëŠ¥ ê°ì²´ì˜ ì¸í„°í˜ì´ìŠ¤ ì„ ì–¸
+		@detail function<R () > ì„ ì–¸ì‹œ ì‹¤ì œ íƒ€ì… ì¶”ë¡ ì´ ë¶ˆê°€ëŠ¥í•˜ë¯€ë¡œ
+		ë°”ì¸ë”©ì‹œ callable ì˜ concrete class ì— ë°”ì¸ë”© ë˜ê³  function ì€
+		callable ì„ ê°€ì§€ë„ë¡ êµ¬ì„±
 	*/
 	template < typename Signature >
 	class callable;
 
 	/*!
-		@brief callable ±¸Çö
+		@brief callable êµ¬í˜„
 	*/
 	template < typename R, typename ...Args >
 	class callable< R(Args...)> {
@@ -35,8 +35,8 @@ namespace codex {
 		static std::shared_ptr< callable > make_callable(Function&& f);
 	};
 	/*!
-		@brief function ÀÇ ÅÛÇÃ¸´ Æ¯¼öÈ­
-		@detail Args ´Â parameter pack
+		@brief function ì˜ í…œí”Œë¦¿ íŠ¹ìˆ˜í™”
+		@detail Args ëŠ” parameter pack
 	*/
 	template < typename R, typename ...Args >
 	class function< R(Args...)>
@@ -45,20 +45,20 @@ namespace codex {
 		function(void);
 
 		/*!
-		@brief È£Ãâ °¡´É °´Ã¼·Î ºÎÅÍ »ı¼º 
-		@detail universal reference ·Î Ãß·ĞµÊ
+		@brief í˜¸ì¶œ ê°€ëŠ¥ ê°ì²´ë¡œ ë¶€í„° ìƒì„±
+		@detail universal reference ë¡œ ì¶”ë¡ ë¨
 		*/
 		template < typename U >
 		explicit function(U&& func);
 		/*!
-		@brief const È£Ãâ °¡´É °´Ã¼·Î ºÎÅÍ »ı¼º
+		@brief const í˜¸ì¶œ ê°€ëŠ¥ ê°ì²´ë¡œ ë¶€í„° ìƒì„±
 		*/
 		template < typename U >
 		explicit function(const U& func);
 
 		function(const function& rhs);
 		function(function&& rhs);
-		 
+
 		function& operator=(const function& rhs);
 		function& operator=(function&& rhs);
 
@@ -81,7 +81,7 @@ namespace codex {
 		_callable.swap(rhs._callable);
 	}
 
-	
+
 }
 
 #include <codex/function.ipp>

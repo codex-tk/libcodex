@@ -6,8 +6,8 @@
 namespace codex {
 
 	/*!
-	@brief ¸â¹ö º¯¼ö Æ÷ÀÎÅÍ·Î ºÎÅÍ ºÎ¸ğ Å¬·¡½º ÁÖ¼Ò¸¦ ¾Ë¾Æ¿À´Â ÇÔ¼ö
-	@detail Member Parent::* ptr Àº &Class::Member ¸¦ ÀÇ¹ÌÇÔ
+	@brief ë©¤ë²„ ë³€ìˆ˜ í¬ì¸í„°ë¡œ ë¶€í„° ë¶€ëª¨ í´ë˜ìŠ¤ ì£¼ì†Œë¥¼ ì•Œì•„ì˜¤ëŠ” í•¨ìˆ˜
+	@detail Member Parent::* ptr ì€ &Class::Member ë¥¼ ì˜ë¯¸í•¨
 	*/
 	template < typename Parent , typename Member >
 	Parent* container_of0(Member* ptr , Member Parent::*mem_ptr) {

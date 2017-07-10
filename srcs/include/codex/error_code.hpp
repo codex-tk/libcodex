@@ -28,14 +28,14 @@ namespace codex {
 	const std::error_category& category(void);
 
 	/*!
-	@brief ADL Lookup À¸·Î std ¿¡¼­ ÇØ´ç ÇÔ¼ö¸¦ Ã£¾Æ¼­ »ç¿ë
-	codex::errc ¿Í µ¿ÀÏÇÑ ³×ÀÓ½ºÆäÀÌ½º¿¡ Á¸ÀçÇØ¾ßÇÑ´Ù.
+	@brief ADL Lookup ìœ¼ë¡œ std ì—ì„œ í•´ë‹¹ í•¨ìˆ˜ë¥¼ ì°¾ì•„ì„œ ì‚¬ìš©
+	codex::errc ì™€ ë™ì¼í•œ ë„¤ì„ìŠ¤í˜ì´ìŠ¤ì— ì¡´ì¬í•´ì•¼í•œë‹¤.
 	*/
 	std::error_code make_error_code(codex::errc ec);
 
 	/*!
-	@brief ADL Lookup À¸·Î std ¿¡¼­ ÇØ´ç ÇÔ¼ö¸¦ Ã£¾Æ¼­ »ç¿ë
-	codex::errc ¿Í µ¿ÀÏÇÑ ³×ÀÓ½ºÆäÀÌ½º¿¡ Á¸ÀçÇØ¾ßÇÑ´Ù.
+	@brief ADL Lookup ìœ¼ë¡œ std ì—ì„œ í•´ë‹¹ í•¨ìˆ˜ë¥¼ ì°¾ì•„ì„œ ì‚¬ìš©
+	codex::errc ì™€ ë™ì¼í•œ ë„¤ì„ìŠ¤í˜ì´ìŠ¤ì— ì¡´ì¬í•´ì•¼í•œë‹¤.
 	*/
 	std::error_condition make_error_condition(codex::errc ec);
 
@@ -45,7 +45,7 @@ namespace codex {
 
 namespace std {
 	/*!
-		
+
 	*/
 	//template <> struct is_error_code_enum< codex::errc > : public true_type{};
 	template <> struct is_error_condition_enum< codex::errc > : public true_type {};
