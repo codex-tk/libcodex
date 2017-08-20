@@ -3,7 +3,9 @@
 
 #if defined( _WIN32 )
 
+#if !defined(NOMINMAX)
 #define NOMINMAX
+#endif
 
 #include <WinSock2.h>
 #include <MSWSock.h>

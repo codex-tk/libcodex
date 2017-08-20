@@ -378,3 +378,5 @@ xcode
 compile_commands.json
 cmake_gen
 .vs
+
+build-*
