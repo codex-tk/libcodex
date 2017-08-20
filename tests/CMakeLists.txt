@@ -64,6 +64,8 @@ add_executable( codex.tests
   test_conv.cpp
   test_main.cpp
   test_boost_regex.cpp
+	test_singleton_dclp.cpp
+	test_test.cpp
   ${PLATFORM_DEPEND_SRCS}
 )
 

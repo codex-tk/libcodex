@@ -55,6 +55,7 @@ set( HEADERS
   	include/codex/conv/checksum.hpp
   	include/codex/conv/crc32.hpp
   	include/codex/conv/string.hpp
+		include/codex/singleton.hpp
     ${PLATFORM_DEPEND_HEADERS}
 )
 
