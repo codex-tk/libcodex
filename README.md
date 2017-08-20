@@ -1,2 +1,2 @@
 # libcodex
-personal c++ library for learn and use
+personal c++ library
