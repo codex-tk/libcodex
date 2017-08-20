@@ -1,4 +1,5 @@
 #include <codex/conv/base64.hpp>
+#include <map>
 
 namespace codex {
 namespace detail{
@@ -9,7 +10,7 @@ namespace detail{
   /*!
   @brief decode table
   */
-  char b64dec_map[256] = { 0 };
+  std::map<char, int> b64dec_map;
 }
 	std::string base64::encode(const std::vector< uint8_t >& src) {
 		std::string result;
@@ -48,28 +49,8 @@ namespace detail{
     static std::once_flag dec_map_init_flag;
     // reverse table generate
     std::call_once(dec_map_init_flag, []() {
-      int upper_cnt = 'Z' - 'A' + 1;
-      int low_cnt = 'z' - 'a' + 1;
-      int num_cnt = '9' - '0' + 1;
-      for (int i = 0; i < 256; ++i) {
-        if (i >= 'A' && i <= 'Z') {
-          detail::b64dec_map[i] = static_cast<char>( i - 'A' );
-        }
-        else if (i >= 'a' && i <= 'z') {
-          detail::b64dec_map[i] = static_cast<char>(i - 'a' + upper_cnt);
-        }
-        else if (i >= '0' && i <= '9') {
-          detail::b64dec_map[i] = static_cast<char>(i - '0' + upper_cnt + low_cnt);
-        }
-        else if (i == '+') {
-          detail::b64dec_map[i] = static_cast<char>(upper_cnt + low_cnt + num_cnt);
-        }
-        else if (i == '/') {
-          detail::b64dec_map[i] = static_cast<char>(upper_cnt + low_cnt + num_cnt + 1);
-        }
-        else {
-          detail::b64dec_map[i] = 0;
-        }
+      for (int i = 0; i < detail::b64enc_map.length(); ++i) {
+        detail::b64dec_map[detail::b64enc_map[i]] = i;
       }
     });
     std::vector< uint8_t > result;

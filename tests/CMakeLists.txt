@@ -62,6 +62,7 @@ add_executable( codex.tests
   test_container_of.cpp
   test_error.cpp
   test_conv.cpp
+  test_vision_bitmap.cpp
   test_main.cpp
   test_boost_regex.cpp
 	test_singleton_dclp.cpp

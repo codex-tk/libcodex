@@ -56,15 +56,19 @@ set( HEADERS
   	include/codex/conv/crc32.hpp
   	include/codex/conv/string.hpp
 		include/codex/singleton.hpp
+    include/codex/vision/image.hpp
+    include/codex/vision/bitmap.hpp
     ${PLATFORM_DEPEND_HEADERS}
-)
+    )
 
 set( SRCS
     srcs/codex.cpp
-  	srcs/error_code.cpp
-  	srcs/conv/base64.cpp
-  	srcs/conv/crc32.cpp
-  	srcs/conv/string.cpp
+    srcs/error_code.cpp
+    srcs/conv/base64.cpp
+    srcs/conv/crc32.cpp
+    srcs/conv/string.cpp
+    srcs/vision/image.cpp
+    srcs/vision/bitmap.cpp
     ${PLATFORM_DEPEND_SRCS}
     )
 

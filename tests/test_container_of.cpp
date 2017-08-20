@@ -28,4 +28,3 @@ TEST(find_class_ptr, container_of) {
 	base* objptr = codex::container_of(value1_ptr, &base::value1 );
 	ASSERT_EQ(&obj, objptr);
 }
-
