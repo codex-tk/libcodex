@@ -62,14 +62,17 @@ void save_to(const byte_image& img, const std::string& file) {
   bih.height = img.height();
   bih.planes = 1;
   bih.bitcount = 8;
-  bih.compression = BI_RGB;
+  bih.compression = 0;//BI_RGB;
   bih.size_image = bih.width * bih.height;
  
   std::ofstream os(file, std::ofstream::binary);
   os.write(reinterpret_cast<char*>(&bfh), sizeof(bfh));
   os.write(reinterpret_cast<char*>(&bih), sizeof(bih));
   for (int i = 0; i < 256; ++i) {
-    rgb_quad gray_scale = { i , i , i , 0 };
+    rgb_quad gray_scale = {   static_cast<uint8_t>(i)
+                            , static_cast<uint8_t>(i)
+                            , static_cast<uint8_t>(i)
+                            , 0 };
     os.write(reinterpret_cast<char*>(&gray_scale), sizeof(gray_scale));
   }
   for (int r = img.height() - 1; r >= 0; --r) {

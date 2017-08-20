@@ -64,7 +64,7 @@ namespace codex { namespace vision {
       template < typename otherT >
       image( const image< otherT >& rhs )
         : _width(rhs._width) , _height(rhs._height) , _channel(rhs._channel)
-        , _stride(((width * channel * sizeof(typeT)+3) & ~3 )/sizeof(typeT))
+        , _stride(((rhs._width * rhs._channel * sizeof(typeT)+3) & ~3 )/sizeof(typeT))
         , _buffer( _height * _stride )
       {
           for ( int r = 0 ; r < _height ; ++r )
