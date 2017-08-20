@@ -55,6 +55,7 @@ set( HEADERS
   	include/codex/conv/checksum.hpp
   	include/codex/conv/crc32.hpp
   	include/codex/conv/string.hpp
+	include/codex/vision/image.hpp
     ${PLATFORM_DEPEND_HEADERS}
 )
 
@@ -64,6 +65,7 @@ set( SRCS
   	srcs/conv/base64.cpp
   	srcs/conv/crc32.cpp
   	srcs/conv/string.cpp
+	srcs/vision/image.cpp
     ${PLATFORM_DEPEND_SRCS}
     )
 
