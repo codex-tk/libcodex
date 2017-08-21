@@ -18,6 +18,13 @@ namespace codex { namespace vision {
     template < typename typeT , typename Allocator = std::allocator<typeT>>
     class image_base {
     public:
+        image_base()
+          : image_base(0,0)
+        {
+
+        }
+
+
       image_base( std::size_t width , std::size_t height , std::size_t channel = 1)
         : _width(width) , _height(height) , _channel(channel)
         , _stride(((width * channel * sizeof(typeT)+3) & ~3 )/sizeof(typeT))

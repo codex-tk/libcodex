@@ -2,6 +2,8 @@
 #define MAINWINDOW_HPP
 
 #include <QMainWindow>
+#include <codex/vision/image.hpp>
+#include <codex/vision/bitmap.hpp>
 
 namespace Ui {
   class MainWindow;
@@ -22,8 +24,11 @@ private slots:
 
     void on_pushButton_3_clicked();
 
+    void on_pushButton_4_clicked();
+
 private:
   Ui::MainWindow *ui;
+  codex::vision::image _image;
 };
 
 #endif // MAINWINDOW_HPP
