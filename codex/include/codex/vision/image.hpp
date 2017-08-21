@@ -16,9 +16,9 @@ namespace codex { namespace vision {
     }
 
     template < typename typeT , typename Allocator = std::allocator<typeT>>
-    class image {
+    class image_base {
     public:
-      image( std::size_t width , std::size_t height , std::size_t channel = 1)
+      image_base( std::size_t width , std::size_t height , std::size_t channel = 1)
         : _width(width) , _height(height) , _channel(channel)
         , _stride(((width * channel * sizeof(typeT)+3) & ~3 )/sizeof(typeT))
         , _buffer( _height * _stride )
@@ -26,7 +26,7 @@ namespace codex { namespace vision {
 
       }
 
-      image( const image& rhs )
+      image_base( const image_base& rhs )
         : _width(rhs._width) , _height(rhs._height) , _channel(rhs._channel)
         , _stride(rhs._stride)
         , _buffer( rhs._buffer )
@@ -34,14 +34,14 @@ namespace codex { namespace vision {
 
       }
 
-      image( image&& rhs )
+      image_base( image_base&& rhs )
         : _width(rhs._width) , _height(rhs._height) , _channel(rhs._channel)
         , _stride(rhs._stride)
         , _buffer( std::move(rhs._buffer))
       {
       }
 
-      image& operator=( const image& rhs )
+      image_base& operator=( const image_base& rhs )
       {
         _width = rhs._width;
         _height = rhs._height;
@@ -51,7 +51,7 @@ namespace codex { namespace vision {
         return *this;
       }
 
-      image& operator=( image&& rhs )
+      image_base& operator=( image_base&& rhs )
       {
         _width = rhs._width;
         _height = rhs._height;
@@ -62,7 +62,7 @@ namespace codex { namespace vision {
       }
 
       template < typename otherT >
-      image( const image< otherT >& rhs )
+      image_base( const image_base< otherT >& rhs )
         : _width(rhs._width) , _height(rhs._height) , _channel(rhs._channel)
         , _stride(((rhs._width * rhs._channel * sizeof(typeT)+3) & ~3 )/sizeof(typeT))
         , _buffer( _height * _stride )
@@ -78,7 +78,7 @@ namespace codex { namespace vision {
       }
 
 
-      ~image( void ) {
+      ~image_base( void ) {
       }
 
       std::size_t width(void) const { return _width; }
@@ -110,6 +110,7 @@ namespace codex { namespace vision {
       std::vector<typeT , Allocator > _buffer;
     };
 
+    typedef image_base<uint8_t> image;
 }}
 
 #endif

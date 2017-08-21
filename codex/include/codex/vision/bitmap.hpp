@@ -37,10 +37,9 @@ struct rgb_quad {
     uint8_t reserved;
 };
 #pragma pack()
-typedef image<uint8_t> byte_image;
 
-byte_image load_from( const std::string& file );
-void save_to(const byte_image& img , const std::string& file);
+image load_from( const std::string& file );
+void save_to(const image& img , const std::string& file);
 
 }}
 

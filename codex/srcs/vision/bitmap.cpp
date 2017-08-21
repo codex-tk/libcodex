@@ -3,7 +3,7 @@
 
 namespace  codex { namespace vision{
 
-byte_image load_from( const std::string& file ) {
+image load_from( const std::string& file ) {
     class scoped_ifstream {
     public:
         scoped_ifstream( std::ifstream& is )
@@ -17,9 +17,9 @@ byte_image load_from( const std::string& file ) {
     };
 
     if ( file.size() < 4 )
-        return byte_image(0,0);
+        return image(0,0);
     if ( file.substr( file.size() - 3 , 3 ) != "bmp")
-        return byte_image(0,0);
+        return image(0,0);
     bitmap_file_header bfh;
     bitmap_info_header bih;
 
@@ -28,7 +28,7 @@ byte_image load_from( const std::string& file ) {
         scoped_ifstream sis(is);
         is.read(reinterpret_cast<char*>(&bfh), sizeof(bfh));
         if ( bfh.type != 0x4d42 )
-            return byte_image(0,0);
+            return image(0,0);
 
         is.read(reinterpret_cast<char*>(&bih) , sizeof(bih));
 
@@ -37,17 +37,17 @@ byte_image load_from( const std::string& file ) {
         int height = bih.height;
 
         is.seekg(bfh.offbits , is.beg);
-        byte_image img(width,height,channel);
+        image img(width,height,channel);
         for ( int r = height - 1 ; r >= 0 ; --r ) {
             is.read(reinterpret_cast<char*>(img.ptr(r)) , img.stride() );
         }
         return img;
     }
-    return byte_image(0,0);
+    return image(0,0);
 }
 
 
-void save_to(const byte_image& img, const std::string& file) {
+void save_to(const image& img, const std::string& file) {
   bitmap_file_header bfh;
   bitmap_info_header bih;
   memset(&bfh, 0x00, sizeof(bfh));

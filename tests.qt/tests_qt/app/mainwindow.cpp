@@ -20,7 +20,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    codex::vision::image<uint8_t> img(640,480);
+    codex::vision::image img(640,480);
     double x = 255.0f / img.width();
     for ( int r = 0 ; r < img.height() ;++r ){
         for ( int c = 0 ;c < img.width() ;++c){
@@ -29,4 +29,6 @@ void MainWindow::on_pushButton_clicked()
     }
     QImage qimg(img.ptr() , img.width() , img.height() , QImage::Format_Grayscale8 );
     ui->label->setPixmap( QPixmap::fromImage(qimg));
+    ui->label->setScaledContents( true );
+    ui->label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
 }

@@ -2,12 +2,12 @@
 #include <codex/vision/bitmap.hpp>
 
 TEST(vision, bitmap) {
-  codex::vision::byte_image img = codex::vision::load_from("C:\\Users\\codex\\works\\libcodex\\tests.qt\\freedive.bmp");
+  codex::vision::image img = codex::vision::load_from("C:\\Users\\codex\\works\\libcodex\\tests.qt\\freedive.bmp");
 
-  codex::vision::byte_image base(320, 320, 1);
+  codex::vision::image base(320, 320, 1);
   base.reset(0);
-  codex::vision::byte_image img1(base);
-  codex::vision::byte_image img2(base);
+  codex::vision::image img1(base);
+  codex::vision::image img2(base);
 
   double incx = 255.0 / base.width();
   double incy = 255.0 / base.height();
