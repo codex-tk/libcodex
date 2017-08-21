@@ -97,7 +97,9 @@ namespace codex { namespace vision {
       typeT& at( std::size_t x , std::size_t y , std::size_t ch = 0 ) {
           return _buffer[ y * _stride + x * _channel + ch ];
       }
-
+      const typeT& at( std::size_t x , std::size_t y , std::size_t ch = 0 ) const {
+          return _buffer[ y * _stride + x * _channel + ch ];
+      }
       void reset( typeT val ) {
           _buffer.assign( _buffer.size() , val );
       }

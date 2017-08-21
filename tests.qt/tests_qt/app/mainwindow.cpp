@@ -4,6 +4,7 @@
 #include <codex/error_code.hpp>
 #include <codex/vision/image.hpp>
 #include <codex/vision/bitmap.hpp>
+#include <codex/vision/image_proc.hpp>
 
 using namespace codex::vision;
 
@@ -38,6 +39,16 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_pushButton_2_clicked()
 {
     codex::vision::image img = codex::vision::load_from("/Users/ghtak/Projects/personal/libcodex/tests.qt/2.bmp");
+    QImage qimg(img.ptr() , img.width() , img.height() , QImage::Format_Grayscale8 );
+    ui->label->setPixmap( QPixmap::fromImage(qimg));
+    ui->label->setScaledContents( true );
+    ui->label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    codex::vision::image ori = codex::vision::load_from("/Users/ghtak/Projects/personal/libcodex/tests.qt/freedive.bmp");
+    codex::vision::image img = codex::vision::gray_scale( ori );
     QImage qimg(img.ptr() , img.width() , img.height() , QImage::Format_Grayscale8 );
     ui->label->setPixmap( QPixmap::fromImage(qimg));
     ui->label->setScaledContents( true );

@@ -58,6 +58,7 @@ set( HEADERS
 		include/codex/singleton.hpp
     include/codex/vision/image.hpp
     include/codex/vision/bitmap.hpp
+    include/codex/vision/image_proc.hpp
     ${PLATFORM_DEPEND_HEADERS}
     )
 
@@ -69,6 +70,7 @@ set( SRCS
     srcs/conv/string.cpp
     srcs/vision/image.cpp
     srcs/vision/bitmap.cpp
+    srcs/vision/image_proc.cpp
     ${PLATFORM_DEPEND_SRCS}
     )
 
