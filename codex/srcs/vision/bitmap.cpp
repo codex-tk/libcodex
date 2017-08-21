@@ -4,28 +4,25 @@
 namespace  codex { namespace vision{
 
 image load_from( const std::string& file ) {
-    class scoped_ifstream {
-    public:
-        scoped_ifstream( std::ifstream& is )
-            : _is(is)
-        {}
-        ~scoped_ifstream(){
-            _is.close();
-        }
-    private:
-        std::ifstream& _is;
-    };
-
     if ( file.size() < 4 )
         return image(0,0);
-    if ( file.substr( file.size() - 3 , 3 ) != "bmp")
-        return image(0,0);
+
+    static std::string bmp_ext(".bmp");
+
+    auto it = file.rbegin();
+    auto it2 = bmp_ext.rbegin();
+    for ( int i = 0 ; i < 4 ; ++i ) {
+        if ( *it != *it2 ) {
+            return image(0,0);
+        }
+        ++it; ++it2;
+    }
+
     bitmap_file_header bfh;
     bitmap_info_header bih;
 
     std::ifstream is (file, std::ifstream::binary);
     if (is) {
-        scoped_ifstream sis(is);
         is.read(reinterpret_cast<char*>(&bfh), sizeof(bfh));
         if ( bfh.type != 0x4d42 )
             return image(0,0);
