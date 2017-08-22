@@ -70,4 +70,26 @@ namespace codex { namespace vision {
       }
   }
 
+  void histogram_graph( const image& src , image& dst ) {
+      dst = image(256,256);
+
+      int hist[256] = {0};
+      double max_hist = 0;
+      for ( std::size_t y = 0 ; y < src.height() ; ++y ){
+          for ( std::size_t x = 0 ; x < src.width() ; ++x ) {
+              hist[ src.at(x,y)] += 1;
+              if ( hist[ src.at(x,y)] > max_hist ) {
+                  max_hist = hist[ src.at(x,y)];
+              }
+          }
+      }
+      for ( int x = 0 ; x < 256; ++x ) {
+          codex::vision::line_to( dst
+                                 , codex::vision::point{ x , 255 }
+                                 , codex::vision::point{ x , static_cast<int>(
+                                                         256 - (hist[x] / max_hist * 256)) }
+                                 , 255 );
+      }
+  }
+
 }}

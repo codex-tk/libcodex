@@ -59,6 +59,31 @@ void MainWindow::on_pushButton_3_clicked()
 void MainWindow::on_pushButton_4_clicked()
 {
     codex::vision::image img(this->_image.width() , this->_image.height());
+    codex::vision::histogram_equation(this->_image,img);
+    codex::vision::image orig_hist;
+    codex::vision::image euquation_hist;
+    codex::vision::histogram_graph(this->_image,orig_hist);
+    codex::vision::histogram_graph(img,euquation_hist);
+
+    QImage qimg(img.ptr() , img.width() , img.height()
+                , QImage::Format_Grayscale8 );
+    ui->label->setPixmap( QPixmap::fromImage(qimg));
+    ui->label->setScaledContents( true );
+    ui->label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+
+    QImage qimg2(orig_hist.ptr() , orig_hist.width() , orig_hist.height()
+                 , QImage::Format_Grayscale8 );
+    ui->label_2->setPixmap( QPixmap::fromImage(qimg2));
+    ui->label_2->setScaledContents( true );
+    ui->label_2->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+
+
+    QImage qimg3(euquation_hist.ptr() , euquation_hist.width() , euquation_hist.height()
+                 , QImage::Format_Grayscale8 );
+    ui->label_3->setPixmap( QPixmap::fromImage(qimg3));
+    ui->label_3->setScaledContents( true );
+    ui->label_3->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+    /*
     codex::vision::image oh;
     codex::vision::image he;
     codex::vision::histogram_equation_debug(this->_image , img , oh , he );
@@ -78,13 +103,16 @@ void MainWindow::on_pushButton_4_clicked()
     ui->label_3->setPixmap( QPixmap::fromImage(qimg3));
     ui->label_3->setScaledContents( true );
     ui->label_3->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+    */
 }
 
 void MainWindow::on_pushButton_5_clicked()
 {
     codex::vision::image img(320,240);
-    codex::vision::line_to(img,codex::vision::point{ 0 , 0 } ,codex::vision::point{ 160 , 120 } , 255 );
-    QImage qimg(img.ptr() , img.width() , img.height() , QImage::Format_Grayscale8 );
+    codex::vision::line_to(img,codex::vision::point{0,0}
+                           , codex::vision::point{160,120}
+                           , 255 );
+    QImage qimg(img.ptr(),img.width(),img.height(),QImage::Format_Grayscale8 );
     ui->label->setPixmap( QPixmap::fromImage(qimg));
     ui->label->setScaledContents( true );
     ui->label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );

@@ -16,7 +16,7 @@ namespace codex { namespace vision {
                   ; ++y ) {
                 img.at(from.x,y) = color;
             }
-        }if ( from.y == to.y ) {
+        } else if ( from.y == to.y ) {
             for ( int x = std::min(from.x,to.x)
                   ; x < std::max(from.x,to.x)
                   ; ++x ) {
