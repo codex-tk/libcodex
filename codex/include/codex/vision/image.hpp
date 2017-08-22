@@ -2,6 +2,7 @@
 #define __codex_vision_image_h__
 
 #include <codex/codex.hpp>
+#include <codex/vision/vision.hpp>
 
 namespace codex { namespace vision {
 

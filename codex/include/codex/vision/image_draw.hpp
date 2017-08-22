@@ -5,4 +5,12 @@
 
 namespace codex { namespace vision {
 
+    void line_to( image& img
+                  , const codex::vision::point& from
+                  , const codex::vision::point& to
+                  , const uint8_t color
+                  );
+
 }}
+
+#endif

@@ -32,14 +32,17 @@ HEADERS += \
         $$CODEX_INCLUDE_DIR/error_code.hpp\
         $$CODEX_INCLUDE_DIR/vision/image.hpp\
         $$CODEX_INCLUDE_DIR/vision/bitmap.hpp\
-        $$CODEX_INCLUDE_DIR/vision/image_proc.hpp
+        $$CODEX_INCLUDE_DIR/vision/vision.hpp\
+        $$CODEX_INCLUDE_DIR/vision/image_proc.hpp\
+        $$CODEX_INCLUDE_DIR/vision/image_draw.hpp\
 
 SOURCES += \
         $$CODEX_SRCS_DIR/codex.cpp\
         $$CODEX_SRCS_DIR/error_code.cpp\
         $$CODEX_SRCS_DIR/vision/image.cpp\
         $$CODEX_SRCS_DIR/vision/bitmap.cpp\
-        $$CODEX_SRCS_DIR/vision/image_proc.cpp
+        $$CODEX_SRCS_DIR/vision/image_proc.cpp\
+        $$CODEX_SRCS_DIR/vision/image_draw.cpp
 
 unix {
     target.path = /usr/lib

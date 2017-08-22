@@ -4,6 +4,7 @@
 #include <codex/error_code.hpp>
 
 #include <codex/vision/image_proc.hpp>
+#include <codex/vision/image_draw.hpp>
 
 using namespace codex::vision;
 
@@ -58,7 +59,31 @@ void MainWindow::on_pushButton_3_clicked()
 void MainWindow::on_pushButton_4_clicked()
 {
     codex::vision::image img(this->_image.width() , this->_image.height());
-    codex::vision::histogram_equation(this->_image , img);
+    codex::vision::image oh;
+    codex::vision::image he;
+    codex::vision::histogram_equation_debug(this->_image , img , oh , he );
+    //this->_image = img;
+    QImage qimg(img.ptr() , img.width() , img.height() , QImage::Format_Grayscale8 );
+    ui->label->setPixmap( QPixmap::fromImage(qimg));
+    ui->label->setScaledContents( true );
+    ui->label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+
+    QImage qimg2(oh.ptr() , oh.width() , oh.height() , QImage::Format_Grayscale8 );
+    ui->label_2->setPixmap( QPixmap::fromImage(qimg2));
+    ui->label_2->setScaledContents( true );
+    ui->label_2->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+
+
+    QImage qimg3(he.ptr() , he.width() , he.height() , QImage::Format_Grayscale8 );
+    ui->label_3->setPixmap( QPixmap::fromImage(qimg3));
+    ui->label_3->setScaledContents( true );
+    ui->label_3->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+}
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    codex::vision::image img(320,240);
+    codex::vision::line_to(img,codex::vision::point{ 0 , 0 } ,codex::vision::point{ 160 , 120 } , 255 );
     QImage qimg(img.ptr() , img.width() , img.height() , QImage::Format_Grayscale8 );
     ui->label->setPixmap( QPixmap::fromImage(qimg));
     ui->label->setScaledContents( true );

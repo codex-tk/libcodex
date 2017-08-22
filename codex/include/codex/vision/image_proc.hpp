@@ -19,7 +19,7 @@ namespace codex { namespace vision {
     }
 
     void histogram_equation( const image& src , image& dst );
-
+    void histogram_equation_debug( const image& src , image& dst , image& orig_hist , image& equation_hist );
 }}
 
 
