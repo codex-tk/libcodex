@@ -27,10 +27,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    qtconvinience.cpp
 
 HEADERS += \
-        mainwindow.hpp
+        mainwindow.hpp \
+    qtconvinience.hpp
 
 FORMS += \
         mainwindow.ui

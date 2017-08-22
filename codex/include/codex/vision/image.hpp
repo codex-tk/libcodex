@@ -13,7 +13,8 @@ namespace codex { namespace vision {
 
     template < typename typeT , typename otherT >
     typeT pixel_cast( otherT src ) {
-        return src < 0 ? 0 : src > 0xff ? 0xff : src;
+        return src < 0 ? 0 : src > std::numeric_limits<typeT>::max() ?
+                             std::numeric_limits<typeT>::max() : src;
     }
 
     template < typename typeT , typename Allocator = std::allocator<typeT>>

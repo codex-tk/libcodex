@@ -5,8 +5,15 @@
 
 #include <codex/vision/image_proc.hpp>
 #include <codex/vision/image_draw.hpp>
+#include "qtconvinience.hpp"
 
 using namespace codex::vision;
+
+#if defined( __codex_win32__ )
+std::string path = R"(C:\Users\codex\works\libcodex\tests.qt\)";
+#else
+std::string path = "/Users/ghtak/Projects/personal/libcodex/tests.qt/";
+#endif
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
@@ -30,30 +37,20 @@ void MainWindow::on_pushButton_clicked()
             img.at(c,r) = (c * x + r * y) / 2;
         }
     }
-    QImage qimg(img.ptr() , img.width() , img.height() , QImage::Format_Grayscale8 );
-    ui->label->setPixmap( QPixmap::fromImage(qimg));
-    ui->label->setScaledContents( true );
-    ui->label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+    QTConvinience::bind(ui->label , img);
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    codex::vision::image img = codex::vision::load_from("/Users/ghtak/Projects/personal/libcodex/tests.qt/2.bmp");
-    QImage qimg(img.ptr() , img.width() , img.height() , QImage::Format_Grayscale8 );
-    ui->label->setPixmap( QPixmap::fromImage(qimg));
-    ui->label->setScaledContents( true );
-    ui->label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+    codex::vision::image img = codex::vision::load_from(path + "2.bmp");
+    QTConvinience::bind(ui->label , img);
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    codex::vision::image ori = codex::vision::load_from("/Users/ghtak/Projects/personal/libcodex/tests.qt/freedive.bmp");
-    this->_image = codex::vision::image(ori.width(),ori.height());
-    codex::vision::gray_scale( ori , this->_image );
-    QImage qimg(this->_image.ptr() , this->_image.width() , this->_image.height() , QImage::Format_Grayscale8 );
-    ui->label->setPixmap( QPixmap::fromImage(qimg));
-    ui->label->setScaledContents( true );
-    ui->label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+    codex::vision::image ori = codex::vision::load_from(path +"freedive.bmp");
+    this->_image =  codex::vision::gray_scale( ori);
+    QTConvinience::bind(ui->label , this->_image);
 }
 
 void MainWindow::on_pushButton_4_clicked()
@@ -65,45 +62,9 @@ void MainWindow::on_pushButton_4_clicked()
     codex::vision::histogram_graph(this->_image,orig_hist);
     codex::vision::histogram_graph(img,euquation_hist);
 
-    QImage qimg(img.ptr() , img.width() , img.height()
-                , QImage::Format_Grayscale8 );
-    ui->label->setPixmap( QPixmap::fromImage(qimg));
-    ui->label->setScaledContents( true );
-    ui->label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-
-    QImage qimg2(orig_hist.ptr() , orig_hist.width() , orig_hist.height()
-                 , QImage::Format_Grayscale8 );
-    ui->label_2->setPixmap( QPixmap::fromImage(qimg2));
-    ui->label_2->setScaledContents( true );
-    ui->label_2->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-
-
-    QImage qimg3(euquation_hist.ptr() , euquation_hist.width() , euquation_hist.height()
-                 , QImage::Format_Grayscale8 );
-    ui->label_3->setPixmap( QPixmap::fromImage(qimg3));
-    ui->label_3->setScaledContents( true );
-    ui->label_3->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-    /*
-    codex::vision::image oh;
-    codex::vision::image he;
-    codex::vision::histogram_equation_debug(this->_image , img , oh , he );
-    //this->_image = img;
-    QImage qimg(img.ptr() , img.width() , img.height() , QImage::Format_Grayscale8 );
-    ui->label->setPixmap( QPixmap::fromImage(qimg));
-    ui->label->setScaledContents( true );
-    ui->label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-
-    QImage qimg2(oh.ptr() , oh.width() , oh.height() , QImage::Format_Grayscale8 );
-    ui->label_2->setPixmap( QPixmap::fromImage(qimg2));
-    ui->label_2->setScaledContents( true );
-    ui->label_2->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-
-
-    QImage qimg3(he.ptr() , he.width() , he.height() , QImage::Format_Grayscale8 );
-    ui->label_3->setPixmap( QPixmap::fromImage(qimg3));
-    ui->label_3->setScaledContents( true );
-    ui->label_3->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-    */
+    QTConvinience::bind(ui->label , img);
+    QTConvinience::bind(ui->label_2 , orig_hist);
+    QTConvinience::bind(ui->label_3 , euquation_hist);
 }
 
 void MainWindow::on_pushButton_5_clicked()
@@ -112,8 +73,22 @@ void MainWindow::on_pushButton_5_clicked()
     codex::vision::line_to(img,codex::vision::point{0,0}
                            , codex::vision::point{160,120}
                            , 255 );
-    QImage qimg(img.ptr(),img.width(),img.height(),QImage::Format_Grayscale8 );
-    ui->label->setPixmap( QPixmap::fromImage(qimg));
-    ui->label->setScaledContents( true );
-    ui->label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+    QTConvinience::bind(ui->label , img);
+}
+
+void MainWindow::on_pushButton_6_clicked()
+{
+    codex::vision::image ori = codex::vision::load_from(path +"freedive.bmp");
+    codex::vision::image gray = codex::vision::gray_scale(ori);
+    codex::vision::image sample( gray.width() , gray.height());
+    double x = 255.0f / sample.width();
+    double y = 255.0f / sample.height();
+    for ( std::size_t r = 0 ; r < sample.height() ;++r ){
+        for ( std::size_t c = 0 ;c < sample.width() ;++c){
+            sample.at(c,r) = 256 - ( r * y );
+            //sample.at(c,r) = (c * x + r * y) / 2;
+        }
+    }
+    codex::vision::image sum = gray + sample;
+    QTConvinience::bind(ui->label , sum);
 }
