@@ -28,6 +28,69 @@ namespace codex { namespace vision {
     void histogram_graph( const image& src , image& dst );
 
 
+    template < typename typeT >
+    void add( const image_base<typeT>& src0
+              , const image_base<typeT>& src1
+              , image_base<typeT>& dst  )
+    {
+        /*
+        cassert( src0.width() == src1.width());
+        cassert( src1.width() == dst.width());
+        cassert( src0.height() == src1.height());
+        cassert( src1.height() == dst.height());
+        cassert( src0.channel() == src1.channel());
+        cassert( src1.channel() == dst.channel());
+        */
+        for ( std::size_t y = 0 ; y < src0.height() ; ++y ) {
+            for ( std::size_t x = 0 ; x < src0.width() ; ++x ) {
+                for ( std::size_t c = 0; c < src0.channel() ; ++c ) {
+                    dst.at(x,y,c) = codex::vision::operation<typeT>::add( src0.at(x,y,c) , src1.at(x,y,c));
+                }
+            }
+        }
+    }
+
+    template < typename typeT >
+    void sub( const image_base<typeT>& src0
+              , const image_base<typeT>& src1
+              , image_base<typeT>& dst  )
+    {
+        /*
+        cassert( src0.width() == src1.width());
+        cassert( src1.width() == dst.width());
+        cassert( src0.height() == src1.height());
+        cassert( src1.height() == dst.height());
+        cassert( src0.channel() == src1.channel());
+        cassert( src1.channel() == dst.channel());
+        */
+        for ( std::size_t y = 0 ; y < src0.height() ; ++y ) {
+            for ( std::size_t x = 0 ; x < src0.width() ; ++x ) {
+                for ( std::size_t c = 0; c < src0.channel() ; ++c ) {
+                    dst.at(x,y,c) = codex::vision::operation<typeT>::sub( src0.at(x,y,c) , src1.at(x,y,c));
+                }
+            }
+        }
+    }
+
+    template < typename typeT >
+    image_base<typeT> operator+( const image_base<typeT>& src0
+                                 , const image_base<typeT>& src1 )
+    {
+        image_base<typeT> dst( src0.width() , src0.height() , src0.channel());
+        add( src0 , src1 , dst );
+        return dst;
+    }
+
+    template < typename typeT >
+    image_base<typeT> operator-( const image_base<typeT>& src0
+                                 , const image_base<typeT>& src1 )
+    {
+        image_base<typeT> dst( src0.width() , src0.height() , src0.channel());
+        sub( src0 , src1 , dst );
+        return dst;
+    }
+
+    /*
     namespace detail{
         template < typename typeT , typename handlerT >
         image_base<typeT> operation_impl( const image_base<typeT>& src0
@@ -72,6 +135,7 @@ namespace codex { namespace vision {
             return val;
         });
     }
+    */
 
 
 }}

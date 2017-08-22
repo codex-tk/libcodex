@@ -89,6 +89,6 @@ void MainWindow::on_pushButton_6_clicked()
             //sample.at(c,r) = (c * x + r * y) / 2;
         }
     }
-    codex::vision::image sum = gray + sample;
+    codex::vision::image sum = gray - sample;
     QTConvinience::bind(ui->label , sum);
 }
