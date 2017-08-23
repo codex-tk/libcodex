@@ -1,5 +1,8 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
+#include <QtDebug>
+#include <QTime>
+
 #include <codex/codex.hpp>
 #include <codex/error_code.hpp>
 
@@ -99,10 +102,15 @@ void MainWindow::on_pushButton_7_clicked()
     codex::vision::kernel<3,3> mask{ 0.0 , -1.0 , 0.0
                                     , -1.0, 4.0, -1.0
                                     ,0.0 , -1.0 , 0.0 };
+    QTime startTime = QTime::currentTime();
     codex::vision::image ori = codex::vision::load_from(path +"freedive.bmp");
+    qDebug()<< "Load " << startTime.elapsed(); startTime = QTime::currentTime();
     codex::vision::image gray = codex::vision::gray_scale(ori);
+    qDebug()<< "Gray " << startTime.elapsed(); startTime = QTime::currentTime();
     codex::vision::image sample( gray.width() , gray.height());
-    codex::vision::convolution_sum(gray,mask,sample);
-
+    qDebug()<< "newImg " << startTime.elapsed(); startTime = QTime::currentTime();
+    codex::vision::conv(gray,mask,sample);
+    qDebug()<< "conv " << startTime.elapsed(); startTime = QTime::currentTime();
     QTConvinience::bind(ui->label , sample);
+    qDebug()<< "bind " << startTime.elapsed(); startTime = QTime::currentTime();
 }

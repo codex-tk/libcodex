@@ -11,12 +11,14 @@ namespace codex { namespace vision {
     image gray_scale( const image_base<typeT>& src  ){
         image dst( src.width() , src.height());
         for ( std::size_t y = 0 ; y < src.height() ; ++y ){
+            uint8_t* dst_ptr = dst.ptr(y);
             for ( std::size_t x = 0 ; x < src.width() ; ++x ) {
                 int val = 0;
                 for ( std::size_t c = 0 ; c < src.channel() ; ++c ) {
                     val += src.at(x,y,c);
                 }
-                dst.at(x,y) = (val/src.channel());
+                *dst_ptr = codex::vision::operation<uint8_t>::convert(val/src.channel());
+                ++dst_ptr;
             }
         }
         return dst;
@@ -55,12 +57,40 @@ namespace codex { namespace vision {
             return R;
         }
 
+        typeT operator[] ( int idx ) const {
+            return _buffer[idx];
+        }
+
     private:
         std::array< typeT , R * C > _buffer;
     };
 
     template < typename typeT , typename kernelT >
-    void convolution_sum( const image_base<typeT>& src
+    void conv( const image_base<typeT>& src
+                          , const kernelT& kernel
+                          , image_base<typeT>& dst )
+    {
+        for ( std::size_t r = 1 ; r < src.height() - 1 ; ++r ) {
+            typeT* dst_ptr = dst.ptr(r);
+            const typeT* src_ptr_prev = src.ptr(r-1);
+            const typeT* src_ptr = src.ptr(r);
+            const typeT* src_ptr_next = src.ptr(r+1);
+            for ( std::size_t c = 1 ; c < src.width() - 1 ; ++c ) {
+                dst_ptr[c] = codex::vision::operation<typeT>::convert((src_ptr_prev[c-1] * kernel.at(0,0) +
+                            src_ptr_prev[c] * kernel[0] +
+                            src_ptr_prev[c+1] * kernel[1] +
+                            src_ptr[c-1] * kernel[2]+
+                            src_ptr[c] * kernel[3] +
+                            src_ptr[c+1] * kernel[4] +
+                            src_ptr_next[c-1] * kernel[5] +
+                            src_ptr_next[c] * kernel[6] +
+                            src_ptr_next[c+1] * kernel[7]));
+            }
+        }
+
+    }
+    template < typename typeT , typename kernelT >
+    void convolution( const image_base<typeT>& src
                           , const kernelT& kernel
                           , image_base<typeT>& dst )
     {
@@ -69,31 +99,52 @@ namespace codex { namespace vision {
         int row_step = kernel.rows() / 2;
         int col_step = kernel.cols() / 2;
         double div = kernel.rows() * kernel.cols();
-        for ( std::size_t r = 0 ; r < src.height() ; ++r ) {
-            for ( std::size_t c = 0 ; c < src.width() ; ++c ) {
-                for ( std::size_t ch = 0 ; ch < channel ; ++ch ) {
+        if ( channel == 1 ) {
+            for ( std::size_t r = 0 ; r < src.height() ; ++r ) {
+                typeT* dst_ptr = dst.ptr(r);
+                for ( std::size_t c = 0 ; c < src.width() ; ++c ) {
                     double sum = 0;
                     for ( int y = 0 ; y < kernel.rows() ; ++y ) {
                         int row_index = r + y - row_step;
                         if ( row_index >= 0 && row_index < src.height() ) {
                             const typeT* src_ptr = src.ptr(row_index);
                             for ( int x = 0 ; x < kernel.cols() ; ++x ) {
-                                int col_index = c * channel + x - col_step;
+                                int col_index = c + x - col_step;
                                 if ( col_index >= 0 && col_index < src.width()){
                                     sum += src_ptr[ col_index ] * kernel.at(x,y);
                                 }
-                                /*
-                                sum += (src.at_r( c + x - col_step
-                                                 ,row_index
-                                                 ,ch , 0) * kernel.at(x,y));*/
                             }
                         }
-
                     }
-                    dst.at(c,r,ch) = codex::vision::operation<typeT>::convert( sum + 100);/// div);
+                    *dst_ptr = codex::vision::operation<typeT>::convert( sum );
+                    ++dst_ptr;
+                }
+            }
+        } else {
+            for ( std::size_t r = 0 ; r < src.height() ; ++r ) {
+                typeT* dst_ptr = dst.ptr(r);
+                for ( std::size_t c = 0 ; c < src.width() ; ++c ) {
+                    for ( std::size_t ch = 0 ; ch < channel ; ++ch ) {
+                        double sum = 0;
+                        for ( int y = 0 ; y < kernel.rows() ; ++y ) {
+                            int row_index = r + y - row_step;
+                            if ( row_index >= 0 && row_index < src.height() ) {
+                                const typeT* src_ptr = src.ptr(row_index);
+                                for ( int x = 0 ; x < kernel.cols() ; ++x ) {
+                                    int col_index = c * channel + x - col_step;
+                                    if ( col_index >= 0 && col_index < src.width()){
+                                        sum += src_ptr[ col_index ] * kernel.at(x,y);
+                                    }
+                                }
+                            }
+                        }
+                        *dst_ptr = codex::vision::operation<typeT>::convert( sum );
+                        ++dst_ptr;
+                    }
                 }
             }
         }
+
     }
 }}
 
