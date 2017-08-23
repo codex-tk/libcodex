@@ -81,7 +81,7 @@ void MainWindow::on_pushButton_6_clicked()
     codex::vision::image ori = codex::vision::load_from(path +"freedive.bmp");
     codex::vision::image gray = codex::vision::gray_scale(ori);
     codex::vision::image sample( gray.width() , gray.height());
-    double x = 255.0f / sample.width();
+    //double x = 255.0f / sample.width();
     double y = 255.0f / sample.height();
     for ( std::size_t r = 0 ; r < sample.height() ;++r ){
         for ( std::size_t c = 0 ;c < sample.width() ;++c){
@@ -89,6 +89,20 @@ void MainWindow::on_pushButton_6_clicked()
             //sample.at(c,r) = (c * x + r * y) / 2;
         }
     }
-    codex::vision::image sum = gray - sample;
+    codex::vision::image::value_type val = 100;
+    codex::vision::image sum = gray + val;
     QTConvinience::bind(ui->label , sum);
+}
+
+void MainWindow::on_pushButton_7_clicked()
+{
+    codex::vision::kernel<3,3> mask{ 0.0 , -1.0 , 0.0
+                                    , -1.0, 4.0, -1.0
+                                    ,0.0 , -1.0 , 0.0 };
+    codex::vision::image ori = codex::vision::load_from(path +"freedive.bmp");
+    codex::vision::image gray = codex::vision::gray_scale(ori);
+    codex::vision::image sample( gray.width() , gray.height());
+    codex::vision::convolution_sum(gray,mask,sample);
+
+    QTConvinience::bind(ui->label , sample);
 }

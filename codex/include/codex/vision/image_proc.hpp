@@ -1,6 +1,8 @@
 #ifndef __codex_vision_image_proc_h__
 #define __codex_vision_image_proc_h__
 
+#include <cassert>
+#include <array>
 #include <codex/vision/image.hpp>
 
 namespace codex { namespace vision {
@@ -28,116 +30,71 @@ namespace codex { namespace vision {
     void histogram_graph( const image& src , image& dst );
 
 
-    template < typename typeT >
-    void add( const image_base<typeT>& src0
-              , const image_base<typeT>& src1
-              , image_base<typeT>& dst  )
+    template < size_t R , size_t C , typename typeT = double >
+    class kernel {
+    public:
+        kernel(){}
+
+        template < typename ...argsT >
+        kernel( argsT... args )
+            : _buffer{{ args ... }}{
+        }
+
+        typeT& at( std::size_t x , std::size_t y ) {
+            return _buffer[y * C + x];
+        }
+
+        const typeT& at( std::size_t x , std::size_t y ) const {
+            return _buffer[y * C + x];
+        }
+
+        std::size_t rows() const{
+            return R;
+        }
+        std::size_t cols() const{
+            return R;
+        }
+
+    private:
+        std::array< typeT , R * C > _buffer;
+    };
+
+    template < typename typeT , typename kernelT >
+    void convolution_sum( const image_base<typeT>& src
+                          , const kernelT& kernel
+                          , image_base<typeT>& dst )
     {
-        /*
-        cassert( src0.width() == src1.width());
-        cassert( src1.width() == dst.width());
-        cassert( src0.height() == src1.height());
-        cassert( src1.height() == dst.height());
-        cassert( src0.channel() == src1.channel());
-        cassert( src1.channel() == dst.channel());
-        */
-        for ( std::size_t y = 0 ; y < src0.height() ; ++y ) {
-            for ( std::size_t x = 0 ; x < src0.width() ; ++x ) {
-                for ( std::size_t c = 0; c < src0.channel() ; ++c ) {
-                    dst.at(x,y,c) = codex::vision::operation<typeT>::add( src0.at(x,y,c) , src1.at(x,y,c));
+        assert( is_same_format(src,dst));
+        std::size_t channel = src.channel();
+        int row_step = kernel.rows() / 2;
+        int col_step = kernel.cols() / 2;
+        double div = kernel.rows() * kernel.cols();
+        for ( std::size_t r = 0 ; r < src.height() ; ++r ) {
+            for ( std::size_t c = 0 ; c < src.width() ; ++c ) {
+                for ( std::size_t ch = 0 ; ch < channel ; ++ch ) {
+                    double sum = 0;
+                    for ( int y = 0 ; y < kernel.rows() ; ++y ) {
+                        int row_index = r + y - row_step;
+                        if ( row_index >= 0 && row_index < src.height() ) {
+                            const typeT* src_ptr = src.ptr(row_index);
+                            for ( int x = 0 ; x < kernel.cols() ; ++x ) {
+                                int col_index = c * channel + x - col_step;
+                                if ( col_index >= 0 && col_index < src.width()){
+                                    sum += src_ptr[ col_index ] * kernel.at(x,y);
+                                }
+                                /*
+                                sum += (src.at_r( c + x - col_step
+                                                 ,row_index
+                                                 ,ch , 0) * kernel.at(x,y));*/
+                            }
+                        }
+
+                    }
+                    dst.at(c,r,ch) = codex::vision::operation<typeT>::convert( sum + 100);/// div);
                 }
             }
         }
     }
-
-    template < typename typeT >
-    void sub( const image_base<typeT>& src0
-              , const image_base<typeT>& src1
-              , image_base<typeT>& dst  )
-    {
-        /*
-        cassert( src0.width() == src1.width());
-        cassert( src1.width() == dst.width());
-        cassert( src0.height() == src1.height());
-        cassert( src1.height() == dst.height());
-        cassert( src0.channel() == src1.channel());
-        cassert( src1.channel() == dst.channel());
-        */
-        for ( std::size_t y = 0 ; y < src0.height() ; ++y ) {
-            for ( std::size_t x = 0 ; x < src0.width() ; ++x ) {
-                for ( std::size_t c = 0; c < src0.channel() ; ++c ) {
-                    dst.at(x,y,c) = codex::vision::operation<typeT>::sub( src0.at(x,y,c) , src1.at(x,y,c));
-                }
-            }
-        }
-    }
-
-    template < typename typeT >
-    image_base<typeT> operator+( const image_base<typeT>& src0
-                                 , const image_base<typeT>& src1 )
-    {
-        image_base<typeT> dst( src0.width() , src0.height() , src0.channel());
-        add( src0 , src1 , dst );
-        return dst;
-    }
-
-    template < typename typeT >
-    image_base<typeT> operator-( const image_base<typeT>& src0
-                                 , const image_base<typeT>& src1 )
-    {
-        image_base<typeT> dst( src0.width() , src0.height() , src0.channel());
-        sub( src0 , src1 , dst );
-        return dst;
-    }
-
-    /*
-    namespace detail{
-        template < typename typeT , typename handlerT >
-        image_base<typeT> operation_impl( const image_base<typeT>& src0
-                                          , const image_base<typeT>& src1
-                                          , const handlerT& handler )
-        {
-            image_base<typeT> dst( src0.width() , src0.height());
-            for ( std::size_t r = 0 ; r < src0.height(); ++r ){
-                typeT* dst_ptr = dst.ptr(r);
-                const typeT* src0_ptr = src0.ptr(r);
-                const typeT* src1_ptr = src1.ptr(r);
-                for ( std::size_t c = 0 ; c < src0.width() ; ++c ) {
-                    dst_ptr[c] = handler( src0_ptr[c] , src1_ptr[c]);
-                }
-            }
-            return dst;
-        }
-    }
-
-    template < typename typeT >
-    image_base<typeT> operator+( const image_base<typeT>& src0
-                                 , const image_base<typeT>& src1 )
-    {
-        return detail::operation_impl( src0 , src1 , [] ( typeT a ,typeT b ) -> typeT {
-            decltype ( a + b ) val = a + b;
-            if ( val < 0 ) return 0;
-            if ( val > std::numeric_limits<typeT>::max())
-                return std::numeric_limits<typeT>::max();
-            return val;
-        });
-    }
-
-    template < typename typeT >
-    image_base<typeT> operator-( const image_base<typeT>& src0
-                                 , const image_base<typeT>& src1 )
-    {
-        return detail::operation_impl( src0 , src1 , [] ( typeT a ,typeT b ) {
-            decltype ( a - b ) val = a - b;
-            if ( val < 0 ) return 0;
-            if ( val > std::numeric_limits<typeT>::max())
-                return std::numeric_limits<typeT>::max();
-            return val;
-        });
-    }
-    */
-
-
 }}
 
 
