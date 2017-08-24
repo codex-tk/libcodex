@@ -92,6 +92,13 @@ namespace codex { namespace vision {
       }
   }
 
+  double sqrt(double v ){
+      double n = 1;
+      for ( int i = 0; i < 10 ; ++i ){
+          n =  0.5 * ( n + (v / n) );
+      }
+      return n;
+  }
 
 /*
   template <>

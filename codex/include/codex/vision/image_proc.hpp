@@ -42,12 +42,17 @@ namespace codex { namespace vision {
         std::array< typeT , R * C > _buffer;
     };
 
-    static codex::vision::kernel<3,3> laplacian_mask{
+    static codex::vision::kernel<3,3> laplacian {
         0.0 , -1.0 ,  0.0 ,
        -1.0 ,  4.0 , -1.0 ,
         0.0 , -1.0 ,  0.0
     };
 
+    static codex::vision::kernel<3,3> edge {
+        -1.0 , -1.0 , -1.0 ,
+        -1.0 ,  9.0 , -1.0,
+        -1.0 , -1.0 , -1.0
+    };
     static codex::vision::kernel<3,3> sobel_x {
        -1.0 ,  0.0 ,  1.0 ,
        -2.0 ,  0.0 ,  2.0 ,
@@ -238,6 +243,7 @@ namespace codex { namespace vision {
         detail::normalize( soby , norm , dst );
     }
 
+    double sqrt( double v );
 }}
 
 

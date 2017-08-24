@@ -9,6 +9,7 @@
 #include <codex/vision/image_proc.hpp>
 #include <codex/vision/image_draw.hpp>
 #include "qtconvinience.hpp"
+#include <cmath>
 
 using namespace codex::vision;
 
@@ -23,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
   ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
+
 }
 
 MainWindow::~MainWindow()
@@ -106,7 +108,7 @@ void MainWindow::on_pushButton_7_clicked()
     qDebug()<< "Gray " << startTime.elapsed(); startTime = QTime::currentTime();
     codex::vision::image sample( gray.width() , gray.height());
     qDebug()<< "newImg " << startTime.elapsed(); startTime = QTime::currentTime();
-    codex::vision::convolution(gray,codex::vision::laplacian_mask,sample);
+    codex::vision::convolution(gray,codex::vision::laplacian,sample);
     qDebug()<< "conv " << startTime.elapsed(); startTime = QTime::currentTime();
     codex::vision::image hist( sample.width(),sample.height());
     codex::vision::histogram_equation( sample , hist);
@@ -117,6 +119,8 @@ void MainWindow::on_pushButton_7_clicked()
 
 void MainWindow::on_pushButton_8_clicked()
 {
+    qDebug() << codex::vision::sqrt(13);
+    qDebug() << std::sqrt(13);
     codex::vision::image ori = codex::vision::load_from(path +"freedive.bmp");
     codex::vision::image gray = codex::vision::gray_scale(ori);
     codex::vision::image sample( gray.width() , gray.height());
