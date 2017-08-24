@@ -53,6 +53,7 @@ namespace codex { namespace vision {
         std::size_t rows() const{
             return R;
         }
+
         std::size_t cols() const{
             return R;
         }
@@ -65,30 +66,67 @@ namespace codex { namespace vision {
         std::array< typeT , R * C > _buffer;
     };
 
-    template < typename typeT , typename kernelT >
+    static codex::vision::kernel<3,3> laplacian_mask{
+        0.0 , -1.0 , 0.0
+        , -1.0, 4.0, -1.0
+        ,0.0 , -1.0 , 0.0
+    };
+
+    template < typename typeT , size_t R , size_t C , typename kernel_data_typeT >
     void conv( const image_base<typeT>& src
-                          , const kernelT& kernel
+                          , const kernel<R,C,kernel_data_typeT>& kernel
                           , image_base<typeT>& dst )
     {
-        for ( std::size_t r = 1 ; r < src.height() - 1 ; ++r ) {
-            typeT* dst_ptr = dst.ptr(r);
-            const typeT* src_ptr_prev = src.ptr(r-1);
-            const typeT* src_ptr = src.ptr(r);
-            const typeT* src_ptr_next = src.ptr(r+1);
-            for ( std::size_t c = 1 ; c < src.width() - 1 ; ++c ) {
-                dst_ptr[c] = codex::vision::operation<typeT>::convert((src_ptr_prev[c-1] * kernel.at(0,0) +
-                            src_ptr_prev[c] * kernel[0] +
-                            src_ptr_prev[c+1] * kernel[1] +
-                            src_ptr[c-1] * kernel[2]+
-                            src_ptr[c] * kernel[3] +
-                            src_ptr[c+1] * kernel[4] +
-                            src_ptr_next[c-1] * kernel[5] +
-                            src_ptr_next[c] * kernel[6] +
-                            src_ptr_next[c+1] * kernel[7]));
+        std::size_t channel = src.channel();
+
+        std::array<const typeT* , R > row_ptrs;
+        int r_step = R/2;
+        int c_step = C/2;
+
+        if ( channel == 1 ){
+            for ( std::size_t r = r_step ; r < src.height() - r_step ; ++r ) {
+                typeT* dst_ptr = dst.ptr(r);
+                for ( int i = -r_step ; i <= r_step ; ++i ){
+                    row_ptrs[i + r_step] = src.ptr( r + i );
+                }
+                for ( std::size_t c = c_step ; c < src.width() - c_step ; ++c ) {
+                    double val = 0;
+                    for ( std::size_t i = 0 ; i < R * C ; ++i ) {
+                        val += (row_ptrs[ i / R ][ c + ( i % C ) - c_step ] * kernel[i]);
+                    }
+                    if ( val <= 0 ) val += 128;
+                    dst_ptr[c] = codex::vision::operation<typeT>::convert(val);
+                }
+            }
+        } else {
+            for ( std::size_t r = r_step ; r < src.height() - r_step ; ++r ) {
+                typeT* dst_ptr = dst.ptr(r);
+                for ( int i = -r_step ; i <= r_step ; ++i ){
+                    row_ptrs[i + r_step] = src.ptr( r + i );
+                }
+                for ( std::size_t c = c_step ; c < src.width() - c_step ; ++c ) {
+                    std::size_t c_idx = c * channel;
+                    for ( std::size_t ch = 0 ; ch < channel ; ++ ch ) {
+                        c_idx += ch;
+                        double val = 0;
+                        for ( std::size_t i = 0 ; i < R * C ; ++i ) {
+                            val += (row_ptrs[ i / R ][ c + ( i % C ) - c_step ] * kernel[i]);
+                        }
+                        if ( val <= 0 ) val += 128;
+                        dst_ptr[c_idx] = codex::vision::operation<typeT>::convert(val);
+                    }
+                }
             }
         }
-
     }
+
+    template <>
+    void conv<uint8_t,3,3,double>( const image_base<uint8_t>& src
+                          , const kernel<3,3,double>& kernel
+                          , image_base<uint8_t>& dst );
+
+
+
     template < typename typeT , typename kernelT >
     void convolution( const image_base<typeT>& src
                           , const kernelT& kernel
@@ -98,7 +136,7 @@ namespace codex { namespace vision {
         std::size_t channel = src.channel();
         int row_step = kernel.rows() / 2;
         int col_step = kernel.cols() / 2;
-        double div = kernel.rows() * kernel.cols();
+        //double div = kernel.rows() * kernel.cols();
         if ( channel == 1 ) {
             for ( std::size_t r = 0 ; r < src.height() ; ++r ) {
                 typeT* dst_ptr = dst.ptr(r);

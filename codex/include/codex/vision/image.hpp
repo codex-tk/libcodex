@@ -250,6 +250,7 @@ namespace codex { namespace vision {
         return dst;
     }
 
+    void disable_no_symbol();
     /*
     namespace detail{
         template < typename typeT , typename handlerT >
