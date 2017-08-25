@@ -11,20 +11,22 @@
 #include "qtconvinience.hpp"
 #include <cmath>
 
-using namespace codex::vision;
-
+std::string path() {
 #if defined( __codex_win32__ )
-std::string path = R"(C:\Users\codex\works\libcodex\tests.qt\)";
+    std::string path = R"(C:\Users\codex\works\libcodex\tests.qt\)";
 #else
-std::string path = "/Users/ghtak/Projects/personal/libcodex/tests.qt/";
+    std::string path = "/Users/ghtak/Projects/personal/libcodex/tests.qt/";
 #endif
+    return path;
+}
+using namespace codex::vision;
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow)
 {
-  ui->setupUi(this);
-
+    ui->setupUi(this);
+    this->_bsdiag = new BinarySampleDialog(this);
 }
 
 MainWindow::~MainWindow()
@@ -47,13 +49,13 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    codex::vision::image img = codex::vision::load_from(path + "2.bmp");
+    codex::vision::image img = codex::vision::load_from(path() + "2.bmp");
     QTConvinience::bind(ui->label , img);
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    codex::vision::image ori = codex::vision::load_from(path +"freedive.bmp");
+    codex::vision::image ori = codex::vision::load_from(path() +"freedive.bmp");
     this->_image =  codex::vision::gray_scale( ori);
     QTConvinience::bind(ui->label , this->_image);
 }
@@ -83,7 +85,7 @@ void MainWindow::on_pushButton_5_clicked()
 
 void MainWindow::on_pushButton_6_clicked()
 {
-    codex::vision::image ori = codex::vision::load_from(path +"freedive.bmp");
+    codex::vision::image ori = codex::vision::load_from(path() +"freedive.bmp");
     codex::vision::image gray = codex::vision::gray_scale(ori);
     codex::vision::image sample( gray.width() , gray.height());
     //double x = 255.0f / sample.width();
@@ -102,7 +104,7 @@ void MainWindow::on_pushButton_6_clicked()
 void MainWindow::on_pushButton_7_clicked()
 {
     QTime startTime = QTime::currentTime();
-    codex::vision::image ori = codex::vision::load_from(path +"freedive.bmp");
+    codex::vision::image ori = codex::vision::load_from(path() +"freedive.bmp");
     qDebug()<< "Load " << startTime.elapsed(); startTime = QTime::currentTime();
     codex::vision::image gray = codex::vision::gray_scale(ori);
     qDebug()<< "Gray " << startTime.elapsed(); startTime = QTime::currentTime();
@@ -121,11 +123,16 @@ void MainWindow::on_pushButton_8_clicked()
 {
     qDebug() << codex::vision::sqrt(13);
     qDebug() << std::sqrt(13);
-    codex::vision::image ori = codex::vision::load_from(path +"freedive.bmp");
+    codex::vision::image ori = codex::vision::load_from(path() +"freedive.bmp");
     codex::vision::image gray = codex::vision::gray_scale(ori);
     codex::vision::image sample( gray.width() , gray.height());
     codex::vision::sobel(gray,sample);
     codex::vision::image hist( sample.width(),sample.height());
     codex::vision::histogram_equation( sample , hist);
     QTConvinience::bind(ui->label , hist);
+}
+
+void MainWindow::on_pushButton_9_clicked()
+{
+    this->_bsdiag->show();
 }

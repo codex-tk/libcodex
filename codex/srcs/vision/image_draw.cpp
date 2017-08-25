@@ -23,11 +23,11 @@ namespace codex { namespace vision {
                 img.at(x,from.y) = color;
             }
         } else {
-            double slope = ( from.y - to.y )/(double)(from.x - to.x );
+            double coefficient = ( from.y - to.y )/(double)(from.x - to.x );
             for ( int x = std::min(from.x,to.x)
                   ; x < std::max(from.x,to.x)
                   ; ++x ) {
-                img.at(x,static_cast<int>(slope*x)) = color;
+                img.at(x,static_cast<int>(coefficient*x)) = color;
             }
         }
     }

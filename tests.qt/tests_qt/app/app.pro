@@ -28,14 +28,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    qtconvinience.cpp
+    qtconvinience.cpp \
+    dialog.cpp \
+    binarysampledialog.cpp
 
 HEADERS += \
         mainwindow.hpp \
-    qtconvinience.hpp
+    qtconvinience.hpp \
+    dialog.h \
+    binarysampledialog.h \
+    app.hpp
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    dialog.ui \
+    binarysampledialog.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../codex/release/ -lcodex
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../codex/debug/ -lcodex

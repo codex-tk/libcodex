@@ -2,8 +2,12 @@
 #define MAINWINDOW_HPP
 
 #include <QMainWindow>
+
+#include "app.hpp"
+
 #include <codex/vision/image.hpp>
 #include <codex/vision/bitmap.hpp>
+#include "binarysampledialog.h"
 
 namespace Ui {
   class MainWindow;
@@ -34,9 +38,12 @@ private slots:
 
     void on_pushButton_8_clicked();
 
+    void on_pushButton_9_clicked();
+
 private:
   Ui::MainWindow *ui;
   codex::vision::image _image;
+  BinarySampleDialog* _bsdiag;
 };
 
 #endif // MAINWINDOW_HPP

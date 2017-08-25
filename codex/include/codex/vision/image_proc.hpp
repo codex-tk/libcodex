@@ -110,6 +110,7 @@ namespace codex { namespace vision {
         }
 
 
+
         template < typename typeT >
         void convolution( const image_base<typeT>& src
                     , const kernel<3,3,double>& kernel
@@ -148,6 +149,19 @@ namespace codex { namespace vision {
             }
         }
 
+        template < typename typeT , size_t R , size_t C , typename kernel_data_typeT >
+        void convolution( const image_base<typeT>& src
+                    , const kernel<R,C,kernel_data_typeT>& kernel
+                    , image_base<double>& out )
+        {
+            std::array< detail::normalize_info , 4 > norm;
+            for ( std::size_t i = 0 ; i < 4 ; ++i ) {
+                norm[i].min = std::numeric_limits<double>::max();
+                norm[i].max = std::numeric_limits<double>::min();
+                norm[i].factor = 0;
+            }
+            convolution( src ,kernel , out , norm);
+        }
         template < typename typeT >
         void normalize(  const image_base<double>& src
                    , std::array< normalize_info , 4 >& norm
