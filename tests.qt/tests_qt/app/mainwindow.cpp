@@ -113,7 +113,8 @@ void MainWindow::on_pushButton_7_clicked()
     codex::vision::image hist( sample.width(),sample.height());
     codex::vision::histogram_equation( sample , hist);
     qDebug()<< "hist " << startTime.elapsed(); startTime = QTime::currentTime();
-    QTConvinience::bind(ui->label , hist);
+    auto result = gray - hist;
+    QTConvinience::bind(ui->label ,  hist);
     qDebug()<< "bind " << startTime.elapsed(); startTime = QTime::currentTime();
 }
 

@@ -43,9 +43,9 @@ namespace codex { namespace vision {
     };
 
     static codex::vision::kernel<3,3> laplacian {
-        0.0 , -1.0 ,  0.0 ,
-       -1.0 ,  4.0 , -1.0 ,
-        0.0 , -1.0 ,  0.0
+        0.0 ,  1.0 ,  0.0 ,
+        1.0 , -4.0 ,  1.0 ,
+        0.0 ,  1.0 ,  0.0
     };
 
     static codex::vision::kernel<3,3> edge {
