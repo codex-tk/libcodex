@@ -96,9 +96,11 @@ void MainWindow::on_pushButton_6_clicked()
             //sample.at(c,r) = (c * x + r * y) / 2;
         }
     }
-    codex::vision::image::value_type val = 100;
-    codex::vision::image sum = gray + val;
-    QTConvinience::bind(ui->label , sum);
+    //codex::vision::image::value_type val = 100;
+    //codex::vision::image sum = gray + val;
+    //QTConvinience::bind(ui->label , sum);
+    gray += 100;
+    QTConvinience::bind(ui->label , gray);
 }
 
 void MainWindow::on_pushButton_7_clicked()
@@ -116,7 +118,8 @@ void MainWindow::on_pushButton_7_clicked()
     codex::vision::histogram_equation( sample , hist);
     qDebug()<< "hist " << startTime.elapsed(); startTime = QTime::currentTime();
     auto result = gray - hist;
-    QTConvinience::bind(ui->label ,  hist);
+    gray -= hist;
+    QTConvinience::bind(ui->label ,  result);
     qDebug()<< "bind " << startTime.elapsed(); startTime = QTime::currentTime();
 }
 

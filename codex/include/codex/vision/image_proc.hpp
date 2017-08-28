@@ -180,10 +180,10 @@ namespace codex { namespace vision {
                     for ( std::size_t ch = 0 ; ch < channel ; ++ ch ) {
                         std::size_t c_idx = c_offset + ch;
                         if ( norm[ch].min < 0 ) {
-                            dst_ptr[c_idx] = codex::vision::operation<uint8_t>::convert(
+                            dst_ptr[c_idx] = codex::vision::operation<typeT,double>::clip(
                                         (tmp_ptr[c_idx] + (norm[ch].min * -1) )* norm[ch].factor );
                         } else {
-                            dst_ptr[c_idx] = codex::vision::operation<uint8_t>::convert(
+                            dst_ptr[c_idx] = codex::vision::operation<typeT,double>::clip(
                                         (tmp_ptr[c_idx] - norm[ch].min )* norm[ch].factor );
                         }
                     }
@@ -197,12 +197,13 @@ namespace codex { namespace vision {
         image dst( src.width() , src.height());
         for ( std::size_t y = 0 ; y < src.height() ; ++y ){
             uint8_t* dst_ptr = dst.ptr(y);
+            const typeT* src_ptr = src.ptr(y);
             for ( std::size_t x = 0 ; x < src.width() ; ++x ) {
-                int val = 0;
+                double val = 0;
                 for ( std::size_t c = 0 ; c < src.channel() ; ++c ) {
-                    val += src.at(x,y,c);
+                    val += src_ptr[ x * src.channel() + c ];
                 }
-                *dst_ptr = codex::vision::operation<uint8_t>::convert(val/src.channel());
+                *dst_ptr = codex::vision::operation<uint8_t,typeT>::clip(val/src.channel());
                 ++dst_ptr;
             }
         }

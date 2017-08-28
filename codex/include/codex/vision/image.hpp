@@ -77,7 +77,7 @@ namespace codex { namespace vision {
                           ; l < std::min(_channel,rhs._channel)
                           ; ++l )
                     {
-                        dst[src_idx + l ] = codex::vision::operation< typeT >::convert( src[dst_idx + l] );
+                        dst[src_idx + l ] = codex::vision::operation< typeT , otherT>::clip( src[dst_idx + l] );
                     }
                 }
             }
@@ -148,6 +148,18 @@ namespace codex { namespace vision {
         void reset( typeT val ) {
             _buffer.assign( _buffer.size() , val );
         }
+
+        template < typename scalarT >
+        image_base& operator+=( const scalarT val );
+
+        template < typename scalarT >
+        image_base& operator-=( const scalarT val );
+
+        template < typename otherT , typename otherAllocator >
+        image_base& operator+=( const image_base<otherT,otherAllocator>& rhs );
+
+        template < typename otherT  , typename otherAllocator >
+        image_base& operator-=( const image_base<otherT,otherAllocator>& rhs );
     private:
         std::size_t _width;
         std::size_t _height;
@@ -171,7 +183,7 @@ namespace codex { namespace vision {
 
     namespace detail {
         template < typename operand0T , typename operand1T , typename ansT , typename handlerT >
-        void apply(  const image_base<operand0T>& operand0
+        void solve(  const image_base<operand0T>& operand0
                      , const image_base<operand1T>& operand1
                      , image_base< ansT >& ans
                      , const handlerT& operation )
@@ -191,7 +203,7 @@ namespace codex { namespace vision {
                             op0v = op0_ptr[ c * operand0.channel() + l];
                         }
                         if ( operand1.channel() > l ) {
-                            op1v = op0_ptr[ c * operand1.channel() + l];
+                            op1v = op1_ptr[ c * operand1.channel() + l];
                         }
                         ans_ptr[c * ans.channel() + l] = operation( op0v , op1v );
                     }
@@ -199,7 +211,7 @@ namespace codex { namespace vision {
             }
         }
         template < typename operand0T , typename operand1T , typename ansT , typename handlerT >
-        void apply(  const image_base<operand0T>& operand0
+        void solve(  const image_base<operand0T>& operand0
                      , const operand1T val
                      , image_base< ansT >& ans
                      , const handlerT& operation )
@@ -227,7 +239,7 @@ namespace codex { namespace vision {
               , const image_base<typeT>& src1
               , image_base<typeT>& dst  )
     {
-        detail::apply( src0 , src1 , dst , &codex::vision::operation<typeT>::add );
+        detail::solve( src0 , src1 , dst , &codex::vision::operation<typeT,typeT>::add);
     }
 
     template < typename typeT >
@@ -235,7 +247,7 @@ namespace codex { namespace vision {
               , const typeT val
               , image_base<typeT>& dst  )
     {
-        detail::apply( src0 , val , dst , &codex::vision::operation<typeT>::add );
+        detail::solve( src0 , val , dst , &codex::vision::operation<typeT,typeT>::add );
     }
 
 
@@ -244,7 +256,7 @@ namespace codex { namespace vision {
               , const image_base<typeT>& src1
               , image_base<typeT>& dst  )
     {
-        detail::apply( src0 , src1 , dst , &codex::vision::operation<typeT>::sub );
+        detail::solve( src0 , src1 , dst , &codex::vision::operation<typeT,typeT>::sub );
     }
 
     template < typename typeT >
@@ -252,7 +264,7 @@ namespace codex { namespace vision {
               , const typeT val
               , image_base<typeT>& dst  )
     {
-        detail::apply( src0 , val , dst , &codex::vision::operation<typeT>::sub );
+        detail::solve( src0 , val , dst , &codex::vision::operation<typeT,typeT>::sub );
     }
 
     template < typename typeT >
@@ -294,52 +306,33 @@ namespace codex { namespace vision {
     }
 
     void disable_no_symbol();
-    /*
-    namespace detail{
-        template < typename typeT , typename handlerT >
-        image_base<typeT> operation_impl( const image_base<typeT>& src0
-                                          , const image_base<typeT>& src1
-                                          , const handlerT& handler )
-        {
-            image_base<typeT> dst( src0.width() , src0.height());
-            for ( std::size_t r = 0 ; r < src0.height(); ++r ){
-                typeT* dst_ptr = dst.ptr(r);
-                const typeT* src0_ptr = src0.ptr(r);
-                const typeT* src1_ptr = src1.ptr(r);
-                for ( std::size_t c = 0 ; c < src0.width() ; ++c ) {
-                    dst_ptr[c] = handler( src0_ptr[c] , src1_ptr[c]);
-                }
-            }
-            return dst;
-        }
+
+    template < typename typeT , typename Allocator >
+    template < typename scalarT >
+    image_base<typeT,Allocator>& image_base<typeT,Allocator>::operator+=( const scalarT val )  {
+        detail::solve( *this , val , *this , &codex::vision::operation<typeT,scalarT>::add);
+        return *this;
+    }
+    template < typename typeT  , typename Allocator >
+    template < typename scalarT >
+    image_base<typeT,Allocator>& image_base<typeT,Allocator>::operator-=( const scalarT val )  {
+        detail::solve( *this , val , *this , &codex::vision::operation<typeT,scalarT>::sub);
+        return *this;
     }
 
-    template < typename typeT >
-    image_base<typeT> operator+( const image_base<typeT>& src0
-                                 , const image_base<typeT>& src1 )
-    {
-        return detail::operation_impl( src0 , src1 , [] ( typeT a ,typeT b ) -> typeT {
-            decltype ( a + b ) val = a + b;
-            if ( val < 0 ) return 0;
-            if ( val > std::numeric_limits<typeT>::max())
-                return std::numeric_limits<typeT>::max();
-            return val;
-        });
+    template < typename typeT , typename Allocator >
+    template < typename otherT , typename otherAllocator>
+    image_base<typeT,Allocator>& image_base<typeT,Allocator>::operator+=( const image_base<otherT,otherAllocator>& rhs )  {
+        detail::solve( *this , rhs , *this , &codex::vision::operation<typeT,otherT>::add);
+        return *this;
+    }
+    template < typename typeT , typename Allocator >
+    template < typename otherT , typename otherAllocator>
+    image_base<typeT,Allocator>& image_base<typeT,Allocator>::operator-=( const image_base<otherT,otherAllocator>& rhs )  {
+        detail::solve( *this , rhs , *this , &codex::vision::operation<typeT,otherT>::sub);
+        return *this;
     }
 
-    template < typename typeT >
-    image_base<typeT> operator-( const image_base<typeT>& src0
-                                 , const image_base<typeT>& src1 )
-    {
-        return detail::operation_impl( src0 , src1 , [] ( typeT a ,typeT b ) {
-            decltype ( a - b ) val = a - b;
-            if ( val < 0 ) return 0;
-            if ( val > std::numeric_limits<typeT>::max())
-                return std::numeric_limits<typeT>::max();
-            return val;
-        });
-    }
-    */
 }}
 
 #endif
