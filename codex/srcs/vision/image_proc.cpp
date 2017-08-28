@@ -165,7 +165,7 @@ namespace codex { namespace vision {
               }
           }
       }
-    /*
+
       std::size_t channel = src.channel();
       for ( std::size_t r = 1 ; r < src.height() - 1 ; ++r ) {
           uint8_t* dst_ptr = dst.ptr(r);
@@ -193,8 +193,6 @@ namespace codex { namespace vision {
       }*/
   //}
 
-/*
- *
 /*
     template < typename typeT , size_t R , size_t C , typename kernel_data_typeT >
     void conv( const image_base<typeT>& src

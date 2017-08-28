@@ -6,22 +6,8 @@
 #include <codex/codex.hpp>
 #include <codex/vision/vision.hpp>
 
-
-
 namespace codex { namespace vision {
 
-/**
-    template < typename typeT >
-    typeT pixel_cast( typeT src ) {
-        return src;
-    }
-
-    template < typename typeT , typename otherT >
-    typeT pixel_cast( otherT src ) {
-        return src < 0 ? 0 : src > std::numeric_limits<typeT>::max() ?
-                             std::numeric_limits<typeT>::max() : src;
-    }
-*/
     template < typename typeT , typename Allocator = std::allocator<typeT>>
     class image_base {
     public:
@@ -29,7 +15,6 @@ namespace codex { namespace vision {
         image_base()
             : image_base(0,0)
         {
-
         }
 
         image_base( std::size_t width , std::size_t height , std::size_t channel = 1)
@@ -81,12 +66,51 @@ namespace codex { namespace vision {
             , _stride(((rhs._width * rhs._channel * sizeof(typeT)+3) & ~3 )/sizeof(typeT))
             , _buffer( _height * _stride )
         {
-            for ( int r = 0 ; r < _height ; ++r )
+            for ( std::size_t r = 0 ; r < _height ; ++r )
             {
                 otherT* src = rhs.ptr(r);
                 typeT* dst = this->ptr(r);
-                for ( int c = 0 ; c < _width ; ++c ) {
-                    dst[c] = codex::vision::operation< typeT >::convert( src[c] );
+                for ( std::size_t c = 0 ; c < _width ; ++c ) {
+                    std::size_t src_idx = c * _channel;
+                    std::size_t dst_idx  = c * rhs._channel;
+                    for ( std::size_t l = 0
+                          ; l < std::min(_channel,rhs._channel)
+                          ; ++l )
+                    {
+                        dst[src_idx + l ] = codex::vision::operation< typeT >::convert( src[dst_idx + l] );
+                    }
+                }
+            }
+        }
+
+        image_base<typeT> get_channel( int l ) {
+            if ( l > _channel ) {
+                return image_base<typeT>();
+            }
+            image_base<typeT> dst( width() , height() );
+            for ( std::size_t r = 0; r < _height ; ++r ) {
+                typeT* src_ptr = this->ptr(r);
+                typeT* dst_ptr = dst.ptr(r);
+                for ( std::size_t c = 0 ; c < _width ; ++c ) {
+                    dst_ptr[c] = src_ptr[ c * _channel + l];
+                }
+            }
+            return dst;
+        }
+
+        void put_channnel( int l , const image_base<typeT>& src , int src_channel = 0 ) {
+            if ( l > _channel ) {
+                return ;
+            }
+            if ( src_channel > src.channel()){
+                return ;
+            }
+
+            for ( std::size_t r = 0; r < _height ; ++r ) {
+                const typeT* src_ptr = src.ptr(r);
+                typeT* dst_ptr = this->ptr(r);
+                for ( std::size_t c = 0 ; c < _width ; ++c ) {
+                    dst_ptr[c * _channel + l] = src_ptr[ c * src.channel() + src_channel];
                 }
             }
         }
@@ -146,33 +170,52 @@ namespace codex { namespace vision {
 
 
     namespace detail {
-        template < typename typeT , typename handlerT >
-        void apply(  const image_base<typeT>& src0
-                     , const image_base<typeT>& src1
-                     , image_base<typeT>& dst
-                     , const handlerT& handler )
+        template < typename operand0T , typename operand1T , typename ansT , typename handlerT >
+        void apply(  const image_base<operand0T>& operand0
+                     , const image_base<operand1T>& operand1
+                     , image_base< ansT >& ans
+                     , const handlerT& operation )
         {
-            assert( is_same_format( src0 , src1));
-            assert( is_same_format( src1 , dst ));
-            for ( std::size_t y = 0 ; y < src0.height() ; ++y ) {
-                for ( std::size_t x = 0 ; x < src0.width() ; ++x ) {
-                    for ( std::size_t c = 0; c < src0.channel() ; ++c ) {
-                        dst.at(x,y,c) = handler(src0.at(x,y,c) , src1.at(x,y,c));
+            assert( (operand0.width() == operand1.width()) && (operand1.width() == ans.width()));
+            assert( (operand0.height() == operand1.height()) && (operand1.height() == ans.height()));
+
+            for ( std::size_t r = 0 ; r < operand0.height() ; ++r ) {
+                const operand0T* op0_ptr = operand0.ptr(r);
+                const operand1T* op1_ptr = operand1.ptr(r);
+                ansT* ans_ptr = ans.ptr(r);
+                for ( std::size_t c = 0 ; c < operand0.width() ; ++c ) {
+                    for ( std::size_t l = 0; l < ans.channel() ; ++l ) {
+                        operand0T op0v = operand0T();
+                        operand1T op1v = operand1T();
+                        if ( operand0.channel() > l ) {
+                            op0v = op0_ptr[ c * operand0.channel() + l];
+                        }
+                        if ( operand1.channel() > l ) {
+                            op1v = op0_ptr[ c * operand1.channel() + l];
+                        }
+                        ans_ptr[c * ans.channel() + l] = operation( op0v , op1v );
                     }
                 }
             }
         }
-        template < typename typeT , typename handlerT >
-        void apply(  const image_base<typeT>& src0
-                     , const typeT val
-                     , image_base<typeT>& dst
-                     , const handlerT& handler )
+        template < typename operand0T , typename operand1T , typename ansT , typename handlerT >
+        void apply(  const image_base<operand0T>& operand0
+                     , const operand1T val
+                     , image_base< ansT >& ans
+                     , const handlerT& operation )
         {
-            assert( is_same_format( src0 , dst));
-            for ( std::size_t y = 0 ; y < src0.height() ; ++y ) {
-                for ( std::size_t x = 0 ; x < src0.width() ; ++x ) {
-                    for ( std::size_t c = 0; c < src0.channel() ; ++c ) {
-                        dst.at(x,y,c) = handler(src0.at(x,y,c) , val);
+            assert( (operand0.width() == ans.width()) && (operand0.height() == ans.height()));
+
+            for ( std::size_t r = 0 ; r < operand0.height() ; ++r ) {
+                const operand0T* op0_ptr = operand0.ptr(r);
+                ansT* ans_ptr = ans.ptr(r);
+                for ( std::size_t c = 0 ; c < operand0.width() ; ++c ) {
+                    for ( std::size_t l = 0; l < ans.channel() ; ++l ) {
+                        operand0T op0v = operand0T();
+                        if ( operand0.channel() > l ) {
+                            op0v = op0_ptr[ c * operand0.channel() + l];
+                        }
+                        ans_ptr[c * ans.channel() + l] = operation( op0v , val );
                     }
                 }
             }
