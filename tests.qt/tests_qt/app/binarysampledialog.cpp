@@ -14,11 +14,18 @@ BinarySampleDialog::BinarySampleDialog(QWidget *parent) :
 
     codex::vision::image gray = codex::vision::gray_scale(ori);
     codex::vision::image sample( gray.width() , gray.height());
-    //codex::vision::convolution(gray,codex::vision::laplacian,sample);
-    codex::vision::sobel(gray,sample);
+    codex::vision::detail::filter(gray,sample ,codex::vision::laplacian , []( double val ) -> uint8_t {
+        return static_cast< uint8_t>(val + 128);
+    });
+    /*
     this->_image = codex::vision::image( sample.width(),sample.height());
     codex::vision::histogram_equation( sample , this->_image );
 
+    this->_binary = codex::vision::image( this->_image.width()
+                                    , this->_image.height()
+                                    , this->_image.channel());
+                                    */
+    this->_image = sample;
     this->_binary = codex::vision::image( this->_image.width()
                                     , this->_image.height()
                                     , this->_image.channel());

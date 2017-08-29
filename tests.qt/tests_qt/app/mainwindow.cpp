@@ -96,9 +96,6 @@ void MainWindow::on_pushButton_6_clicked()
             //sample.at(c,r) = (c * x + r * y) / 2;
         }
     }
-    //codex::vision::image::value_type val = 100;
-    //codex::vision::image sum = gray + val;
-    //QTConvinience::bind(ui->label , sum);
     gray += 100;
     QTConvinience::bind(ui->label , gray);
 }
@@ -112,8 +109,16 @@ void MainWindow::on_pushButton_7_clicked()
     qDebug()<< "Gray " << startTime.elapsed(); startTime = QTime::currentTime();
     codex::vision::image sample( gray.width() , gray.height());
     qDebug()<< "newImg " << startTime.elapsed(); startTime = QTime::currentTime();
-    codex::vision::convolution(gray,codex::vision::laplacian,sample);
+    codex::vision::detail::filter(gray,sample , codex::vision::laplacian ,[]( double val ) -> uint8_t {
+        return static_cast< uint8_t>(val + 128);
+    });
     qDebug()<< "conv " << startTime.elapsed(); startTime = QTime::currentTime();
+    //
+    codex::vision::image hist( sample.width(),sample.height());
+    codex::vision::histogram_equation( sample , hist);
+    QTConvinience::bind(ui->label ,  sample);
+    //
+    /*
     codex::vision::image hist( sample.width(),sample.height());
     codex::vision::histogram_equation( sample , hist);
     qDebug()<< "hist " << startTime.elapsed(); startTime = QTime::currentTime();
@@ -121,10 +126,12 @@ void MainWindow::on_pushButton_7_clicked()
     gray -= hist;
     QTConvinience::bind(ui->label ,  result);
     qDebug()<< "bind " << startTime.elapsed(); startTime = QTime::currentTime();
+    */
 }
 
 void MainWindow::on_pushButton_8_clicked()
 {
+    /*
     qDebug() << codex::vision::sqrt(13);
     qDebug() << std::sqrt(13);
     codex::vision::image ori = codex::vision::load_from(path() +"freedive.bmp");
@@ -133,7 +140,7 @@ void MainWindow::on_pushButton_8_clicked()
     codex::vision::sobel(gray,sample);
     codex::vision::image hist( sample.width(),sample.height());
     codex::vision::histogram_equation( sample , hist);
-    QTConvinience::bind(ui->label , hist);
+    QTConvinience::bind(ui->label , hist);*/
 }
 
 void MainWindow::on_pushButton_9_clicked()

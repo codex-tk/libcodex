@@ -11,6 +11,7 @@ namespace codex { namespace vision {
     template < size_t R , size_t C , typename typeT = double >
     class kernel {
     public:
+        typedef typeT value_type;
         kernel(){}
 
         template < typename ...argsT >
@@ -64,65 +65,82 @@ namespace codex { namespace vision {
         -1.0 , -2.0 , -1.0
     };
 
-    namespace detail{
-
-        struct normalize_info {
-            double min;
-            double max;
-            double factor;
-        };
-
-        template < typename typeT , size_t R , size_t C , typename kernel_data_typeT >
-        void convolution( const image_base<typeT>& src
-                    , const kernel<R,C,kernel_data_typeT>& kernel
-                    , image_base<double>& out
-                    , std::array< normalize_info , 4 >& norm )
+    namespace  detail {
+        template < typename srcT
+                   , typename dstT
+                   , size_t R
+                   , size_t C
+                   , typename kernelValueT
+                   , typename handlerT
+                   >
+        void filter( const image_base< srcT >& src
+                     , image_base< dstT >& dst
+                     , const kernel< R , C , kernelValueT >& kernel
+                     , const handlerT& handler )
         {
-            std::size_t channel = src.channel();
+            assert( src.width() == dst.width());
+            assert( src.height() == dst.height());
+            assert( src.channel() == dst.channel());
 
-            std::array<const typeT* , R > row_ptrs;
-            int r_step = R/2;
-            int c_step = C/2;
+            typedef typename std::conditional<
+                        std::is_floating_point< srcT >::value
+                        || std::is_floating_point< kernelValueT >::value
+                    , double , int >::type value_type;
 
-            for ( std::size_t r = r_step ; r < src.height() - r_step ; ++r ) {
-                double* out_ptr = out.ptr(r);
-                for ( int i = -r_step ; i <= r_step ; ++i ){
-                    row_ptrs[i + r_step] = src.ptr( r + i );
+            std::array< const srcT* , R > row_ptrs;
+
+            int r_step = R / 2;
+            int c_step = C / 2;
+
+            for ( int r = 0 ; r < static_cast<int>(src.height()) ; ++r ) {
+                dstT* dst_ptr = dst.ptr(r);
+                for ( int i = -r_step ; i <= r_step ; ++i ) {
+                    int row_idx = r + i;
+                    if ( row_idx >= 0 && row_idx < static_cast<int>(src.height()) ){
+                        row_ptrs[i+r_step] = src.ptr( row_idx );
+                    } else {
+                        row_ptrs[i+r_step] = nullptr;
+                    }
                 }
-                for ( std::size_t c = c_step ; c < src.width() - c_step ; ++c ) {
-                    std::size_t c_idx = c * channel;
-                    for ( std::size_t ch = 0 ; ch < channel ; ++ ch ) {
-                        c_idx += ch;
-                        double val = 0;
-                        for ( std::size_t i = 0 ; i < R * C ; ++i ) {
-                            val += (row_ptrs[ i / R ][ c + ( i % C ) - c_step ] * kernel[i]);
+
+                for ( int c = 0 ; c < static_cast<int>(src.width()) ; ++c ) {
+                    for ( int l = 0 ; l < static_cast<int>(src.channel()) ; ++l ) {
+                        value_type val = 0;
+                        int k_idx = 0;
+                        for ( int i = -r_step ; i <= r_step ; ++i ) {
+                            const srcT* src_ptr = row_ptrs[i + r_step];
+                            if ( src_ptr ) {
+                                for ( int j = -c_step ; j <= c_step ; ++j ) {
+                                    int col_idx = c + j;
+                                    if ((col_idx >= 0) && (col_idx < static_cast<int>(src.width())))
+                                    {
+                                        kernelValueT kv = kernel[k_idx];
+                                        if ( kv != 0 ) {
+                                            val += (src_ptr[ col_idx * src.channel() + l] * kv);
+                                        }
+                                    }
+                                    ++k_idx;
+                                }
+                            }
                         }
-                        out_ptr[c_idx] = val;
-                        if ( val < norm[ch].min ){
-                            norm[ch].min = val;
-                        }
-                        if ( val > norm[ch].max ){
-                            norm[ch].max = val;
-                        }
+                        dst_ptr[ c * dst.channel() + l ] = handler(val);
                     }
                 }
             }
         }
 
-
-
-        template < typename typeT >
-        void convolution( const image_base<typeT>& src
+        template < typename srcT , typename dstT , typename handlerT >
+        void filter( const image_base<srcT>& src
+                    , image_base<dstT>& out
                     , const kernel<3,3,double>& kernel
-                    , image_base<double>& out
-                    , std::array< normalize_info , 4 >& norm )
+                    , const handlerT& handler  )
         {
             std::size_t channel = src.channel();
             for ( std::size_t r = 1 ; r < src.height() - 1 ; ++r ) {
-                 double* out_ptr = out.ptr(r);
-                const typeT* src_ptr_prev = src.ptr(r-1);
-                const typeT* src_ptr = src.ptr(r);
-                const typeT* src_ptr_next = src.ptr(r+1);
+                dstT* out_ptr = out.ptr(r);
+                const srcT* src_ptr_prev = src.ptr(r-1);
+                const srcT* src_ptr = src.ptr(r);
+                const srcT* src_ptr_next = src.ptr(r+1);
                 for ( std::size_t c = 1 ; c < src.width() - 1 ; ++c ) {
                     std::size_t c_offset = c * channel;
                     for ( std::size_t ch = 0 ; ch < channel ; ++ ch ) {
@@ -137,55 +155,7 @@ namespace codex { namespace vision {
                                         src_ptr_next[c_idx]     * kernel[7] +
                                         src_ptr_next[c_idx+1]   * kernel[8]);
 
-                        out_ptr[c_idx] = val;
-                        if ( val < norm[ch].min ){
-                            norm[ch].min = val;
-                        }
-                        if ( val > norm[ch].max ){
-                            norm[ch].max = val;
-                        }
-                    }
-                }
-            }
-        }
-
-        template < typename typeT , size_t R , size_t C , typename kernel_data_typeT >
-        void convolution( const image_base<typeT>& src
-                    , const kernel<R,C,kernel_data_typeT>& kernel
-                    , image_base<double>& out )
-        {
-            std::array< detail::normalize_info , 4 > norm;
-            for ( std::size_t i = 0 ; i < 4 ; ++i ) {
-                norm[i].min = std::numeric_limits<double>::max();
-                norm[i].max = std::numeric_limits<double>::min();
-                norm[i].factor = 0;
-            }
-            convolution( src ,kernel , out , norm);
-        }
-        template < typename typeT >
-        void normalize(  const image_base<double>& src
-                   , std::array< normalize_info , 4 >& norm
-                   , image_base<typeT>& dst )
-        {
-            std::size_t channel = src.channel();
-            for ( std::size_t i = 0 ; i < channel ; ++i ) {
-                norm[i].factor = std::numeric_limits<typeT>::max()
-                        / fabs( norm[i].max - norm[i].min  );
-            }
-            for ( std::size_t r = 1 ; r < src.height() - 1 ; ++r ) {
-                const double* tmp_ptr = src.ptr(r);
-                typeT* dst_ptr = dst.ptr(r);
-                for ( std::size_t c = 1 ; c < src.width() - 1 ; ++c ) {
-                    std::size_t c_offset = c * channel;
-                    for ( std::size_t ch = 0 ; ch < channel ; ++ ch ) {
-                        std::size_t c_idx = c_offset + ch;
-                        if ( norm[ch].min < 0 ) {
-                            dst_ptr[c_idx] = codex::vision::operation<typeT,double>::clip(
-                                        (tmp_ptr[c_idx] + (norm[ch].min * -1) )* norm[ch].factor );
-                        } else {
-                            dst_ptr[c_idx] = codex::vision::operation<typeT,double>::clip(
-                                        (tmp_ptr[c_idx] - norm[ch].min )* norm[ch].factor );
-                        }
+                        out_ptr[c_idx] = handler(val);
                     }
                 }
             }
@@ -210,53 +180,13 @@ namespace codex { namespace vision {
         return dst;
     }
 
-    void histogram_equation( const image& src , image& dst );
+    void histogram_equation( const image& src , image& dst , const std::size_t channel = 0);
     void histogram_equation_debug( const image& src
                                    , image& dst
                                    , image& orig_hist
                                    , image& equation_hist );
     void histogram_graph( const image& src , image& dst );
 
-
-
-    template < typename typeT , size_t R , size_t C , typename kernel_data_typeT >
-    void convolution( const image_base<typeT>& src
-                          , const kernel<R,C,kernel_data_typeT>& kernel
-                          , image_base<typeT>& dst )
-    {
-        assert( is_same_format(src,dst));
-        image_base<double> temp(src.width(),src.height(),src.channel());
-        std::array< detail::normalize_info , 4 > norm;
-        for ( std::size_t i = 0 ; i < 4 ; ++i ) {
-            norm[i].min = std::numeric_limits<double>::max();
-            norm[i].max = std::numeric_limits<double>::min();
-            norm[i].factor = 0;
-        }
-        detail::convolution( src , kernel , temp , norm );
-        detail::normalize( temp , norm , dst );
-    }
-
-    template < typename typeT >
-    void sobel( const image_base<typeT>& src , image_base<typeT>& dst ){
-        assert( is_same_format(src,dst));
-
-        image_base<double> sobx(src.width(),src.height(),src.channel());
-        image_base<double> soby(src.width(),src.height(),src.channel());
-        std::array< detail::normalize_info , 4 > norm;
-        for ( std::size_t i = 0 ; i < 4 ; ++i ) {
-            norm[i].min = std::numeric_limits<double>::max();
-            norm[i].max = std::numeric_limits<double>::min();
-            norm[i].factor = 0;
-        }
-        detail::convolution( src , sobel_x , sobx , norm );
-        for ( std::size_t i = 0 ; i < 4 ; ++i ) {
-            norm[i].min = std::numeric_limits<double>::max();
-            norm[i].max = std::numeric_limits<double>::min();
-            norm[i].factor = 0;
-        }
-        detail::convolution( sobx, sobel_y , soby , norm );
-        detail::normalize( soby , norm , dst );
-    }
 
     double sqrt( double v );
 }}
