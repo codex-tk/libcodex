@@ -48,7 +48,11 @@ namespace codex { namespace vision {
         1.0 , -4.0 ,  1.0 ,
         0.0 ,  1.0 ,  0.0
     };
-
+    static codex::vision::kernel<3, 3> laplacian8{
+      1.0 ,  1.0 ,  1.0 ,
+      1.0 , -8.0 ,  1.0 ,
+      1.0 ,  1.0 ,  1.0
+    };
     static codex::vision::kernel<3,3> edge {
         -1.0 , -1.0 , -1.0 ,
         -1.0 ,  9.0 , -1.0,

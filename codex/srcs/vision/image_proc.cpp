@@ -17,11 +17,11 @@ namespace codex { namespace vision {
               hist[ src_ptr[ x * src.channel() + channel ] ] += 1;
           }
       }
-      double nop = src.width() * src.height();
+      double nop = static_cast<double>(src.width() * src.height());
       int sum = 0;
       for ( int i = 0 ; i < 256; ++i ) {
           sum += hist[i];
-          norm[i] = sum / nop * 255;
+          norm[i] = static_cast<int>( sum / nop * 255 );
       }
       for ( std::size_t y = 0 ; y < src.height() ; ++y ){
           const uint8_t* src_ptr = src.ptr(y);
@@ -51,11 +51,11 @@ namespace codex { namespace vision {
               }
           }
       }
-      double nop = src.width() * src.height();
+      double nop = static_cast<double>(src.width() * src.height());
       int sum = 0;
       for ( int i = 0 ; i < 256; ++i ) {
           sum += hist[i];
-          norm[i] = sum / nop * 255;
+          norm[i] = static_cast<int>(sum / nop * 255);
       }
       for ( std::size_t y = 0 ; y < src.height() ; ++y ){
           for ( std::size_t x = 0 ; x < src.width() ; ++x ) {

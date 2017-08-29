@@ -51,12 +51,12 @@ void save_to(const image& img, const std::string& file) {
   memset(&bih, 0x00, sizeof(bih));
 
   bfh.type = 0x4d42;
-  bfh.size = sizeof(bfh) + sizeof(bih) + 1024 + img.stride() * img.height();
+  bfh.size = static_cast<int>( sizeof(bfh) + sizeof(bih) + 1024 + img.stride() * img.height() );
   bfh.offbits = sizeof(bfh) + sizeof(bih) + 1024;
 
   bih.size = sizeof(bih);
-  bih.width = img.width();
-  bih.height = img.height();
+  bih.width = static_cast<int>(img.width());
+  bih.height = static_cast<int>(img.height());
   bih.planes = 1;
   bih.bitcount = 8;
   bih.compression = 0;//BI_RGB;
@@ -72,7 +72,7 @@ void save_to(const image& img, const std::string& file) {
                             , 0 };
     os.write(reinterpret_cast<char*>(&gray_scale), sizeof(gray_scale));
   }
-  for (int r = img.height() - 1; r >= 0; --r) {
+  for (int r = static_cast<int>(img.height()) - 1; r >= 0; --r) {
     os.write(reinterpret_cast<const char*>(img.ptr(r)), img.stride());
   }
   os.close();
