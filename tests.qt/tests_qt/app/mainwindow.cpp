@@ -109,15 +109,30 @@ void MainWindow::on_pushButton_7_clicked()
     qDebug()<< "Gray " << startTime.elapsed(); startTime = QTime::currentTime();
     codex::vision::image sample( gray.width() , gray.height());
     qDebug()<< "newImg " << startTime.elapsed(); startTime = QTime::currentTime();
+
+    codex::vision::image_base<double> middle( sample.width() ,sample.height());
+
     codex::vision::detail::filter(gray,sample , codex::vision::laplacian ,[]( double val ) -> uint8_t {
-        return static_cast< uint8_t>(val + 128);
+        //if ( val < 0 )
+            return codex::vision::operation< uint8_t , double >::clip( val + 128 );
+        //return codex::vision::operation< uint8_t , double >::clip( val );
+
     });
-    qDebug()<< "conv " << startTime.elapsed(); startTime = QTime::currentTime();
-    //
     codex::vision::image hist( sample.width(),sample.height());
     codex::vision::histogram_equation( sample , hist);
-    QTConvinience::bind(ui->label ,  sample);
-    //
+    QTConvinience::bind(ui->label ,  hist);
+/*
+    codex::vision::detail::filter(gray, middle , codex::vision::laplacian ,[]( double val ) -> double {
+        return val;
+    });
+*/
+    qDebug()<< "conv " << startTime.elapsed(); startTime = QTime::currentTime();
+    /*
+    codex::vision::detail::normalize( middle , sample );
+    codex::vision::image hist( sample.width(),sample.height());
+    codex::vision::histogram_equation( sample , hist);
+    QTConvinience::bind(ui->label ,  hist);
+    */
     /*
     codex::vision::image hist( sample.width(),sample.height());
     codex::vision::histogram_equation( sample , hist);
