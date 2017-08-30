@@ -33,6 +33,7 @@ HEADERS += \
         $$CODEX_INCLUDE_DIR/vision/image.hpp\
         $$CODEX_INCLUDE_DIR/vision/bitmap.hpp\
         $$CODEX_INCLUDE_DIR/vision/vision.hpp\
+        $$CODEX_INCLUDE_DIR/vision/kernel.hpp\
         $$CODEX_INCLUDE_DIR/vision/image_proc.hpp\
         $$CODEX_INCLUDE_DIR/vision/image_draw.hpp\
 

@@ -33,11 +33,27 @@ MainWindow::MainWindow(QWidget *parent) :
     QStringListModel* model = new QStringListModel(this);
 
     QDir res_dir = QDir(":/res/images/");
-    res_dir.setNameFilters(QStringList() << "*.jpg" << "*.png" );
+    res_dir.setNameFilters(QStringList() << "*.jpg" << "*.png" << "*.bmp");
 
     model->setStringList(res_dir.entryList());
 
     ui->image_file_list->setModel(model );
+
+
+    model = new QStringListModel(this);
+    QStringList lists;
+    lists.append( "prewittX" );
+    lists.append( "prewittY" );
+    lists.append( "sobleX" );
+    lists.append( "sobleY" );
+    lists.append( "emboss1" );
+    lists.append( "emboss2" );
+    lists.append( "laplacian4" );
+    lists.append( "laplacian8" );
+    lists.append( "unsharp4" );
+    lists.append( "unsharp8" );
+    model->setStringList(lists);
+    ui->filter_combobox->setModel(model);
 
     connect(this
             , SIGNAL(sigShowEvent())
@@ -137,19 +153,18 @@ void MainWindow::on_pushButton_7_clicked()
     codex::vision::image hist( sample.width(),sample.height());
     codex::vision::histogram_equation( sample , hist);
    // QTConvinience::bind(ui->label ,  hist);
-/*
+
     codex::vision::detail::filter(gray, middle , codex::vision::laplacian ,[]( double val ) -> double {
         return val;
     });
 
     qDebug()<< "conv " << startTime.elapsed(); startTime = QTime::currentTime();
-    /*
+
     codex::vision::detail::normalize( middle , sample );
     codex::vision::image hist( sample.width(),sample.height());
     codex::vision::histogram_equation( sample , hist);
     QTConvinience::bind(ui->label ,  hist);
-    */
-    /*
+
     codex::vision::image hist( sample.width(),sample.height());
     codex::vision::histogram_equation( sample , hist);
     qDebug()<< "hist " << startTime.elapsed(); startTime = QTime::currentTime();
@@ -222,6 +237,7 @@ void MainWindow::on_to_gray_button_clicked()
     if ( channel == -1 )
         return;
 
+
     _image = codex::vision::image( _base_image->width() , _base_image->height() , channel );
     for ( int r = 0 ; r < _base_image->height() ; ++r ) {
         memcpy( _image.ptr(r) , _base_image->scanLine(r) , _image.stride() );
@@ -257,4 +273,60 @@ void MainWindow::on_median_button_clicked()
     codex::vision::image median( _image.width() , _image.height() , _image.channel() );
     codex::vision::median( _image , median , 3 );
     QTConvinience::bind( ui->image_label , median );
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+     codex::vision::image filtered( _image.width() , _image.height() , _image.channel() );
+    if ( ui->filter_combobox->currentText() == "prewittX" ) {
+        codex::vision::detail::filter( _image , filtered , codex::vision::prewitt_x ,[]( double val ) -> uint8_t {
+            return codex::vision::operation< uint8_t , double >::clip( val + 128 );
+        });
+    }
+    if ( ui->filter_combobox->currentText() == "prewittY" ) {
+        codex::vision::detail::filter( _image , filtered , codex::vision::prewitt_y ,[]( double val ) -> uint8_t {
+            return codex::vision::operation< uint8_t , double >::clip( val + 128 );
+        });
+    }
+    if ( ui->filter_combobox->currentText() ==  "sobleX" ) {
+        codex::vision::detail::filter( _image , filtered , codex::vision::sobel_x ,[]( double val ) -> uint8_t {
+            return codex::vision::operation< uint8_t , double >::clip( val + 128 );
+        });
+    }
+    if ( ui->filter_combobox->currentText() == "sobleY" ) {
+        codex::vision::detail::filter( _image , filtered , codex::vision::sobel_y ,[]( double val ) -> uint8_t {
+            return codex::vision::operation< uint8_t , double >::clip( val + 128 );
+        });
+    }
+    if ( ui->filter_combobox->currentText() ==  "emboss1" ) {
+        codex::vision::detail::filter( _image , filtered , codex::vision::emboss1 ,[]( double val ) -> uint8_t {
+            return codex::vision::operation< uint8_t , double >::clip( val + 128 );
+        });
+    }
+    if ( ui->filter_combobox->currentText() ==   "emboss2" ) {
+        codex::vision::detail::filter( _image , filtered , codex::vision::emboss2 ,[]( double val ) -> uint8_t {
+            return codex::vision::operation< uint8_t , double >::clip( val + 128 );
+        });
+    }
+    if ( ui->filter_combobox->currentText() ==   "laplacian4" ) {
+        codex::vision::detail::filter( _image , filtered , codex::vision::laplacian ,[]( double val ) -> uint8_t {
+            return codex::vision::operation< uint8_t , double >::clip( val + 128 );
+        });
+    }
+    if ( ui->filter_combobox->currentText() ==   "laplacian8" ) {
+        codex::vision::detail::filter( _image , filtered , codex::vision::laplacian8 ,[]( double val ) -> uint8_t {
+            return codex::vision::operation< uint8_t , double >::clip( val + 128 );
+        });
+    }
+    if ( ui->filter_combobox->currentText() ==   "unsharp4" ) {
+        codex::vision::detail::filter( _image , filtered , codex::vision::unsharp ,[]( double val ) -> uint8_t {
+            return codex::vision::operation< uint8_t , double >::clip( val );
+        });
+    }
+    if ( ui->filter_combobox->currentText() ==  "unsharp8" ) {
+        codex::vision::detail::filter( _image , filtered , codex::vision::unsharp8 ,[]( double val ) -> uint8_t {
+            return codex::vision::operation< uint8_t , double >::clip( val );
+        });
+    }
+    QTConvinience::bind( ui->image_label , filtered );
 }

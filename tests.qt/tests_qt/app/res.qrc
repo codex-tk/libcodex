@@ -84,5 +84,6 @@
         <file>images/sudoku.png</file>
         <file>images/templ.png</file>
         <file>images/tmpl.png</file>
+        <file>images/image.bmp</file>
     </qresource>
 </RCC>

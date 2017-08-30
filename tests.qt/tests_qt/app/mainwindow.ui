@@ -55,6 +55,16 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QComboBox" name="filter_combobox"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>Filter</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item row="2" column="0">
@@ -75,7 +85,7 @@
      <x>0</x>
      <y>0</y>
      <width>833</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

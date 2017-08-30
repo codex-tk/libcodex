@@ -42,6 +42,8 @@ private slots:
 
     void on_median_button_clicked();
 
+    void on_pushButton_clicked();
+
 private:
   Ui::MainWindow *ui;
   std::shared_ptr< QImage > _base_image;
