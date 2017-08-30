@@ -33,7 +33,6 @@ void HistogramDialog::showEvent(QShowEvent *ev)
 
 void HistogramDialog::slotShowEvent()
 {
-    qDebug() << "showEvent";
     codex::vision::image hist( _image.width() , _image.height() , _image.channel());
     codex::vision::histogram_equation( _image , hist );
     QTConvinience::bind(ui->origin , _image);
@@ -52,12 +51,8 @@ void HistogramDialog::slotShowEvent()
 
             codex::vision::image graph( 256 , 300 );
             if ( max_hist == 0 ) {
-                 qDebug() <<  "Error";
                 return graph;
-            } else {
-                qDebug()  << "MaxHist" << max_hist;
             }
-
             for ( int i = 0 ; i < 256 ; ++i ) {
                 codex::vision::line_to( graph
                                         , codex::vision::point{  i , 200 }

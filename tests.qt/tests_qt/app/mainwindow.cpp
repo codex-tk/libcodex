@@ -223,8 +223,6 @@ void MainWindow::on_to_gray_button_clicked()
         return;
 
     _image = codex::vision::image( _base_image->width() , _base_image->height() , channel );
-    qDebug() << _image.stride() <<
-                " " << _base_image->bytesPerLine();
     for ( int r = 0 ; r < _base_image->height() ; ++r ) {
         memcpy( _image.ptr(r) , _base_image->scanLine(r) , _image.stride() );
     }
@@ -238,4 +236,25 @@ void MainWindow::on_hist_button_clicked()
 {
     HistogramDialog* dlg = new HistogramDialog(this , _image );
     dlg->show();
+}
+
+void MainWindow::on_Gaussian_clicked()
+{
+    codex::vision::image gauss( _image.width() , _image.height() , _image.channel() );
+    codex::vision::gaussian( _image , gauss , 5 , 1 );
+    QTConvinience::bind( ui->image_label , gauss );
+}
+
+void MainWindow::on_mean_button_clicked()
+{
+    codex::vision::image mean( _image.width() , _image.height() , _image.channel() );
+    codex::vision::mean( _image , mean , 3 );
+    QTConvinience::bind( ui->image_label , mean );
+}
+
+void MainWindow::on_median_button_clicked()
+{
+    codex::vision::image median( _image.width() , _image.height() , _image.channel() );
+    codex::vision::median( _image , median , 3 );
+    QTConvinience::bind( ui->image_label , median );
 }

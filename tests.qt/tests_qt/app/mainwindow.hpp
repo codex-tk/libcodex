@@ -36,6 +36,12 @@ private slots:
 
     void on_hist_button_clicked();
 
+    void on_Gaussian_clicked();
+
+    void on_mean_button_clicked();
+
+    void on_median_button_clicked();
+
 private:
   Ui::MainWindow *ui;
   std::shared_ptr< QImage > _base_image;
