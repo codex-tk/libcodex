@@ -243,6 +243,7 @@ void MainWindow::on_to_gray_button_clicked()
         memcpy( _image.ptr(r) , _base_image->scanLine(r) , _image.stride() );
     }
     if ( _image.channel() != 1 ) {
+        //_image = _image.get_channel(0);
         _image =  codex::vision::gray_scale( _image );
     }
     QTConvinience::bind( ui->image_label , _image );

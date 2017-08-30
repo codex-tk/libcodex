@@ -15,11 +15,19 @@ namespace codex { namespace vision {
             uint8_t* dst_ptr = dst.ptr(y);
             const typeT* src_ptr = src.ptr(y);
             for ( std::size_t x = 0 ; x < src.width() ; ++x ) {
-                double val = 0;
-                for ( std::size_t c = 0 ; c < src.channel() ; ++c ) {
-                    val += src_ptr[ x * src.channel() + c ];
+                if ( src.channel() == 3 || src.channel() == 4 ) {
+                    // BGR to Y
+                    *dst_ptr = 0.114 * src_ptr[ x * src.channel()]
+                             + 0.587 * src_ptr[ x * src.channel() + 1]
+                             + 0.299 * src_ptr[ x * src.channel() + 2];
+                } else {
+                    // mean
+                    double val = 0;
+                    for ( std::size_t c = 0 ; c < src.channel() ; ++c ) {
+                        val += src_ptr[ x * src.channel() + c ];
+                    }
+                    *dst_ptr = codex::vision::operation<uint8_t,typeT>::clip(val/src.channel());
                 }
-                *dst_ptr = codex::vision::operation<uint8_t,typeT>::clip(val/src.channel());
                 ++dst_ptr;
             }
         }
