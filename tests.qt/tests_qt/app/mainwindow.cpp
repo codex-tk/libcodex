@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QtDebug>
 #include <QTime>
+#include <QDir>
 
 #include <codex/codex.hpp>
 #include <codex/error_code.hpp>
@@ -10,6 +11,8 @@
 #include <codex/vision/image_draw.hpp>
 #include "qtconvinience.hpp"
 #include <cmath>
+
+#include "histogramdialog.hpp"
 
 std::string path() {
 #if defined( __codex_win32__ )
@@ -26,14 +29,27 @@ MainWindow::MainWindow(QWidget *parent) :
   ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->_bsdiag = new BinarySampleDialog(this);
+
+    QStringListModel* model = new QStringListModel(this);
+
+    QDir res_dir = QDir(":/res/images/");
+    res_dir.setNameFilters(QStringList() << "*.jpg" << "*.png" );
+
+    model->setStringList(res_dir.entryList());
+
+    ui->image_file_list->setModel(model );
+
+    connect(this
+            , SIGNAL(sigShowEvent())
+            , this
+            , SLOT(slotShowEvent()));
 }
 
 MainWindow::~MainWindow()
 {
   delete ui;
 }
-
+/*
 void MainWindow::on_pushButton_clicked()
 {
     codex::vision::image img(640,480);
@@ -44,20 +60,20 @@ void MainWindow::on_pushButton_clicked()
             img.at(c,r) = (c * x + r * y) / 2;
         }
     }
-    QTConvinience::bind(ui->label , img);
+    //QTConvinience::bind(ui->label , img);
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
     codex::vision::image img = codex::vision::load_from(path() + "2.bmp");
-    QTConvinience::bind(ui->label , img);
+    //QTConvinience::bind(ui->label , img);
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
     codex::vision::image ori = codex::vision::load_from(path() +"freedive.bmp");
     this->_image =  codex::vision::gray_scale( ori);
-    QTConvinience::bind(ui->label , this->_image);
+    //QTConvinience::bind(ui->label , this->_image);
 }
 
 void MainWindow::on_pushButton_4_clicked()
@@ -69,9 +85,9 @@ void MainWindow::on_pushButton_4_clicked()
     codex::vision::histogram_graph(this->_image,orig_hist);
     codex::vision::histogram_graph(img,euquation_hist);
 
-    QTConvinience::bind(ui->label , img);
-    QTConvinience::bind(ui->label_2 , orig_hist);
-    QTConvinience::bind(ui->label_3 , euquation_hist);
+    //QTConvinience::bind(ui->label , img);
+    //QTConvinience::bind(ui->label_2 , orig_hist);
+    //QTConvinience::bind(ui->label_3 , euquation_hist);
 }
 
 void MainWindow::on_pushButton_5_clicked()
@@ -80,7 +96,7 @@ void MainWindow::on_pushButton_5_clicked()
     codex::vision::line_to(img,codex::vision::point{0,0}
                            , codex::vision::point{160,120}
                            , 255 );
-    QTConvinience::bind(ui->label , img);
+   // QTConvinience::bind(ui->label , img);
 }
 
 void MainWindow::on_pushButton_6_clicked()
@@ -97,7 +113,7 @@ void MainWindow::on_pushButton_6_clicked()
         }
     }
     gray += 100;
-    QTConvinience::bind(ui->label , gray);
+   // QTConvinience::bind(ui->label , gray);
 }
 
 void MainWindow::on_pushButton_7_clicked()
@@ -120,12 +136,12 @@ void MainWindow::on_pushButton_7_clicked()
     });
     codex::vision::image hist( sample.width(),sample.height());
     codex::vision::histogram_equation( sample , hist);
-    QTConvinience::bind(ui->label ,  hist);
+   // QTConvinience::bind(ui->label ,  hist);
 /*
     codex::vision::detail::filter(gray, middle , codex::vision::laplacian ,[]( double val ) -> double {
         return val;
     });
-*/
+
     qDebug()<< "conv " << startTime.elapsed(); startTime = QTime::currentTime();
     /*
     codex::vision::detail::normalize( middle , sample );
@@ -142,11 +158,11 @@ void MainWindow::on_pushButton_7_clicked()
     QTConvinience::bind(ui->label ,  result);
     qDebug()<< "bind " << startTime.elapsed(); startTime = QTime::currentTime();
     */
-}
+//}
 
+/*
 void MainWindow::on_pushButton_8_clicked()
 {
-    /*
     qDebug() << codex::vision::sqrt(13);
     qDebug() << std::sqrt(13);
     codex::vision::image ori = codex::vision::load_from(path() +"freedive.bmp");
@@ -155,10 +171,71 @@ void MainWindow::on_pushButton_8_clicked()
     codex::vision::sobel(gray,sample);
     codex::vision::image hist( sample.width(),sample.height());
     codex::vision::histogram_equation( sample , hist);
-    QTConvinience::bind(ui->label , hist);*/
+    QTConvinience::bind(ui->label , hist);
 }
 
 void MainWindow::on_pushButton_9_clicked()
 {
     this->_bsdiag->show();
+}
+*/
+void MainWindow::showEvent(QShowEvent *ev)
+{
+    QMainWindow::showEvent(ev);
+    emit sigShowEvent();
+}
+
+void MainWindow::slotShowEvent()
+{
+
+    //ui->label->setPixmap( QPixmap::fromImage( *_base_images[0] ));
+   // ui->label->setScaledContents( true );
+    //ui->label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+}
+
+void MainWindow::on_image_file_list_clicked(const QModelIndex &index)
+{
+    index.data().toString();
+    _base_image = std::make_shared<QImage>(
+                ":/res/images/" + index.data().toString()
+                );
+    ui->image_label->setPixmap(QPixmap::fromImage( *_base_image ));
+    ui->image_label->setScaledContents(true);
+    ui->image_label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+}
+
+void MainWindow::on_to_gray_button_clicked()
+{
+    int channel = -1;
+    switch ( _base_image->format() ){
+    case QImage::Format_RGB32:
+    case QImage::Format_ARGB32:
+        channel = 4; break;
+    case QImage::Format_Mono:
+    case QImage::Format_Grayscale8:
+        channel = 1; break;
+    default:
+        qDebug() << "Format:" << _base_image->format();
+        break;
+    }
+
+    if ( channel == -1 )
+        return;
+
+    _image = codex::vision::image( _base_image->width() , _base_image->height() , channel );
+    qDebug() << _image.stride() <<
+                " " << _base_image->bytesPerLine();
+    for ( int r = 0 ; r < _base_image->height() ; ++r ) {
+        memcpy( _image.ptr(r) , _base_image->scanLine(r) , _image.stride() );
+    }
+    if ( _image.channel() != 1 ) {
+        _image =  codex::vision::gray_scale( _image );
+    }
+    QTConvinience::bind( ui->image_label , _image );
+}
+
+void MainWindow::on_hist_button_clicked()
+{
+    HistogramDialog* dlg = new HistogramDialog(this , _image );
+    dlg->show();
 }

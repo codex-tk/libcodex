@@ -30,19 +30,24 @@ SOURCES += \
         mainwindow.cpp \
     qtconvinience.cpp \
     dialog.cpp \
-    binarysampledialog.cpp
+    binarysampledialog.cpp \
+    context.cpp \
+    histogramdialog.cpp
 
 HEADERS += \
         mainwindow.hpp \
     qtconvinience.hpp \
     dialog.h \
     binarysampledialog.h \
-    app.hpp
+    app.hpp \
+    context.h \
+    histogramdialog.hpp
 
 FORMS += \
         mainwindow.ui \
     dialog.ui \
-    binarysampledialog.ui
+    binarysampledialog.ui \
+    histogramdialog.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../codex/release/ -lcodex
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../codex/debug/ -lcodex

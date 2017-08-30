@@ -132,7 +132,10 @@ namespace codex { namespace vision {
         }
 
         typeT& at( std::size_t x , std::size_t y , std::size_t ch = 0 ) {
-            return _buffer[ y * _stride + x * _channel + ch ];
+            if ( x >= 0 && x < width() && y >= 0 && y < height())
+                return _buffer[ y * _stride + x * _channel + ch ];
+            static typeT sample;
+            return sample;
         }
 
         const typeT& at( std::size_t x , std::size_t y , std::size_t ch = 0 ) const {
@@ -160,6 +163,19 @@ namespace codex { namespace vision {
 
         template < typename otherT  , typename otherAllocator >
         image_base& operator-=( const image_base<otherT,otherAllocator>& rhs );
+
+        template < typename handlerT >
+        void for_each( const handlerT& handler ) const {
+            for ( std::size_t r = 0; r < height() ; ++r ) {
+                const typeT* buf_ptr = ptr(r);
+                for ( std::size_t c = 0 ; c < width() ; ++c ) {
+                    for ( std::size_t l = 0 ; l < channel() ; ++l ) {
+                        handler( r , c , l , buf_ptr[ c * channel() + l ] );
+                    }
+                }
+            }
+        }
+
     private:
         std::size_t _width;
         std::size_t _height;

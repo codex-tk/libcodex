@@ -2,6 +2,7 @@
 #define MAINWINDOW_HPP
 
 #include <QMainWindow>
+#include <QStringListModel>
 
 #include "app.hpp"
 
@@ -21,29 +22,24 @@ public:
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
 
+protected:
+    void showEvent(QShowEvent *ev);
+
+signals:
+    void sigShowEvent();
+
 private slots:
-    void on_pushButton_clicked();
+    void slotShowEvent();
+    void on_image_file_list_clicked(const QModelIndex &index);
 
-    void on_pushButton_2_clicked();
+    void on_to_gray_button_clicked();
 
-    void on_pushButton_3_clicked();
-
-    void on_pushButton_4_clicked();
-
-    void on_pushButton_5_clicked();
-
-    void on_pushButton_6_clicked();
-
-    void on_pushButton_7_clicked();
-
-    void on_pushButton_8_clicked();
-
-    void on_pushButton_9_clicked();
+    void on_hist_button_clicked();
 
 private:
   Ui::MainWindow *ui;
+  std::shared_ptr< QImage > _base_image;
   codex::vision::image _image;
-  BinarySampleDialog* _bsdiag;
 };
 
 #endif // MAINWINDOW_HPP
