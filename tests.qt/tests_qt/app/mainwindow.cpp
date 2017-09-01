@@ -214,13 +214,11 @@ void MainWindow::on_image_file_list_clicked(const QModelIndex &index)
     _base_image = std::make_shared<QImage>(
                 ":/res/images/" + index.data().toString()
                 );
+    /*
     ui->image_label->setPixmap(QPixmap::fromImage( *_base_image ));
     ui->image_label->setScaledContents(true);
     ui->image_label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
-}
-
-void MainWindow::on_to_gray_button_clicked()
-{
+    */
     int channel = -1;
     switch ( _base_image->format() ){
     case QImage::Format_RGB32:
@@ -237,11 +235,15 @@ void MainWindow::on_to_gray_button_clicked()
     if ( channel == -1 )
         return;
 
-
     _image = codex::vision::image( _base_image->width() , _base_image->height() , channel );
     for ( int r = 0 ; r < _base_image->height() ; ++r ) {
         memcpy( _image.ptr(r) , _base_image->scanLine(r) , _image.stride() );
     }
+    QTConvinience::bind( ui->image_label , _image );
+}
+
+void MainWindow::on_to_gray_button_clicked()
+{
     if ( _image.channel() != 1 ) {
         //_image = _image.get_channel(0);
         _image =  codex::vision::gray_scale( _image );
@@ -278,7 +280,7 @@ void MainWindow::on_median_button_clicked()
 
 void MainWindow::on_pushButton_clicked()
 {
-     codex::vision::image filtered( _image.width() , _image.height() , _image.channel() );
+    codex::vision::image filtered( _image.width() , _image.height() , _image.channel() );
     if ( ui->filter_combobox->currentText() == "prewittX" ) {
         codex::vision::detail::filter( _image , filtered , codex::vision::prewitt_x ,[]( double val ) -> uint8_t {
             return codex::vision::operation< uint8_t , double >::clip( val + 128 );
@@ -311,7 +313,8 @@ void MainWindow::on_pushButton_clicked()
     }
     if ( ui->filter_combobox->currentText() ==   "laplacian4" ) {
         codex::vision::detail::filter( _image , filtered , codex::vision::laplacian ,[]( double val ) -> uint8_t {
-            return codex::vision::operation< uint8_t , double >::clip( val + 128 );
+            return static_cast<uint8_t>( abs(val));
+            //return codex::vision::operation< uint8_t , double >::clip( val + 128 );
         });
     }
     if ( ui->filter_combobox->currentText() ==   "laplacian8" ) {

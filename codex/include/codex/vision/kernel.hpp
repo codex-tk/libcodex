@@ -172,15 +172,15 @@ namespace codex { namespace vision {
                     std::size_t c_offset = c * channel;
                     for ( std::size_t ch = 0 ; ch < channel ; ++ ch ) {
                         std::size_t c_idx = c_offset + ch;
-                        double val = (  src_ptr_prev[c_idx -1]  * kernel[0] +
-                                        src_ptr_prev[c_idx]     * kernel[1] +
-                                        src_ptr_prev[c_idx+1]   * kernel[2] +
-                                        src_ptr[c_idx-1]        * kernel[3] +
-                                        src_ptr[c_idx]          * kernel[4] +
-                                        src_ptr[c_idx+1]        * kernel[5] +
-                                        src_ptr_next[c_idx-1]   * kernel[6] +
-                                        src_ptr_next[c_idx]     * kernel[7] +
-                                        src_ptr_next[c_idx+1]   * kernel[8]);
+                        double val = (  src_ptr_prev[c_idx-channel]   * kernel[0] +
+                                        src_ptr_prev[c_idx]           * kernel[1] +
+                                        src_ptr_prev[c_idx+channel]   * kernel[2] +
+                                        src_ptr[c_idx-channel]        * kernel[3] +
+                                        src_ptr[c_idx]                * kernel[4] +
+                                        src_ptr[c_idx+channel]        * kernel[5] +
+                                        src_ptr_next[c_idx-channel]   * kernel[6] +
+                                        src_ptr_next[c_idx]           * kernel[7] +
+                                        src_ptr_next[c_idx+channel]   * kernel[8]);
 
                         out_ptr[c_idx] = handler(val);
                     }

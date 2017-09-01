@@ -195,6 +195,75 @@ namespace codex { namespace vision {
     }
 
     double sqrt( double v );
+
+    void _FFT1d(double* g, unsigned long N, int isign)
+    {
+        int mmax, m, istep;
+        double wtemp, wr, wpr, wpi, wi, theta;
+        double tempr, tempi;
+        double temp;
+
+        // 스크램블 수행
+        int n = N*2;
+        int j = 1;
+        for (int i=1 ; i<n ; i+=2)
+        {
+            if (j > i)
+            {
+                temp = g[j];
+                g[j] = g[i];
+                g[i] = temp;
+
+                temp = g[j+1];
+                g[j+1] = g[i+1];
+                g[i+1] = temp;
+            }
+            m = n >> 1;
+            while (j>m && m>=2)
+            {
+                j -= m;
+                m >>= 1;
+            }
+            j += m;
+        }
+
+        // 버터플라이 알고리즘 수행
+        mmax = 2; // 2원소 DFT로 시작
+        while (n > mmax)
+        {
+            istep = mmax << 1;
+            theta = isign*(6.28318530717959/mmax);
+            wtemp = sin(0.5*theta);
+            wpr = -2.0*wtemp*wtemp;
+            wpi = sin(theta);
+            wr = 1.0;
+            wi = 0.0;
+            for (m=1 ; m<mmax ; m+=2)
+            {
+                for (int i=m ; i<=n ; i+=istep)
+                {
+                    j = i + mmax;
+                    tempr = double (wr*g[j]-wi*g[j+1]);
+                    tempi = double (wr*g[j+1]+wi*g[j]);
+                    g[j] = g[i]-tempr;
+                    g[j+1] = g[i+1]-tempi;
+                    g[i] += tempr;
+                    g[i+1] += tempi;
+                }
+                wr = (wtemp=wr)*wpr-wi*wpi+wr;
+                wi = wi*wpr+wtemp*wpi+wi;
+            }
+            mmax = istep;
+        }
+
+        if(isign == -1)
+        {
+            for (int i=1 ; i<= n ; i++)
+            {
+                g[i] /= N;
+            }
+        }
+    }
 }}
 
 
