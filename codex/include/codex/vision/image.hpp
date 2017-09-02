@@ -98,7 +98,8 @@ namespace codex { namespace vision {
             return dst;
         }
 
-        void put_channnel( int l , const image_base<typeT>& src , int src_channel = 0 ) {
+        template < typename otherT >
+        void put_channnel( int l , const image_base<otherT>& src , int src_channel = 0 ) {
             if ( l > _channel ) {
                 return ;
             }
@@ -106,10 +107,10 @@ namespace codex { namespace vision {
                 return ;
             }
 
-            for ( std::size_t r = 0; r < _height ; ++r ) {
-                const typeT* src_ptr = src.ptr(r);
+            for ( std::size_t r = 0; r < std::min( src.height(), _height) ; ++r ) {
+                const otherT* src_ptr = src.ptr(r);
                 typeT* dst_ptr = this->ptr(r);
-                for ( std::size_t c = 0 ; c < _width ; ++c ) {
+                for ( std::size_t c = 0 ; c < std::min( src.width(), _width) ; ++c ) {
                     dst_ptr[c * _channel + l] = src_ptr[ c * src.channel() + src_channel];
                 }
             }
@@ -174,6 +175,20 @@ namespace codex { namespace vision {
                     }
                 }
             }
+        }
+
+        image_base transpose(void) {
+            image_base dst( height() , width() , channel() );
+            for ( int r = 0 ; r < height() ; ++r ) {
+                typeT* src_ptr = ptr(r);
+                for ( int c = 0 ; c < width() ; ++c ) {
+                    typeT* dst_ptr = dst.ptr(c);
+                    for ( int l = 0 ; l < channel() ; ++l ) {
+                        dst_ptr[r * channel() + l ] = src_ptr[c * channel() + l];
+                    }
+                }
+            }
+            return dst;
         }
 
     private:

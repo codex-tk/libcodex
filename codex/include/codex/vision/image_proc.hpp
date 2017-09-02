@@ -196,7 +196,8 @@ namespace codex { namespace vision {
 
     double sqrt( double v );
 
-    void fft1d( double* g , unsigned long N , int isign );
+    void fft1d( double* re , double* im , int N , int isign );
+    int fft_size( int n );
 
 /*
     void _FFT1d(double* g, unsigned long N, int isign)

@@ -21,6 +21,13 @@
     <item row="2" column="2">
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="text">
+         <string>Transpose</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="to_gray_button">
         <property name="text">
          <string>Gray</string>
@@ -62,6 +69,13 @@
        <widget class="QPushButton" name="pushButton">
         <property name="text">
          <string>Filter</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="fft_button">
+        <property name="text">
+         <string>FFT</string>
         </property>
        </widget>
       </item>

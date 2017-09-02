@@ -106,6 +106,66 @@ namespace codex { namespace vision {
       return n;
   }
 
+  void fft1d( double* re , double* im , int N , int isign ){
+      int j=0;
+      for ( int i = 0 ; i < N - 1 ; ++i ) {
+          if ( i < j ) {
+              std::swap( re[i] , re[j]);
+              std::swap( im[i] , im[j]);
+          }
+          int k = N >> 1;
+          while ( k <= j ) {
+              j -= k;
+              k >>= 1;
+          }
+          j += k;
+      }
+
+      int mmax, m;
+      double wtemp, wr, wpr, wpi, wi, theta;
+      double tempr, tempi;
+
+      mmax = 2;
+      while ( mmax <= N ) {
+          theta = isign*(6.28318530717959/mmax);
+          wtemp = sin(0.5*theta);
+          wpr = -2.0*wtemp*wtemp;
+          wpi = sin(theta);
+          wr = 1.0;
+          wi = 0.0;
+          int step = mmax / 2;
+          for ( m = 0 ; m <step ; ++m ) {
+              for ( int i = m ; i < N ; i += mmax ) {
+                  j = i + step;
+                  tempr = double (wr*re[j]-wi*im[j]);
+                  tempi = double (wr*im[j]+wi*re[j]);
+                  re[j] = re[i]-tempr;
+                  im[j] = im[i]-tempi;
+                  re[i] += tempr;
+                  im[i] += tempi;
+              }
+              wr = (wtemp=wr)*wpr-wi*wpi+wr;
+              wi = wi*wpr+wtemp*wpi+wi;
+          }
+          mmax <<= 1;
+      }
+      if(isign == -1)
+      {
+          for (int i=0 ; i< N; i++)
+          {
+              re[i] /= N;
+              im[i] /= N;
+          }
+      }
+  }
+
+  int fft_size( int n ){
+      // log a(base) b -> log b / log a
+      // 2 ^ x = n  -> log 2(base) n
+      double x = log(static_cast<double>(n)) / log(2.0);
+      x += 0.9999;
+      return pow( 2.0 , static_cast<int>( x ) );
+  }
 
   /*
       namespace detail{

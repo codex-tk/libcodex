@@ -32,7 +32,8 @@ SOURCES += \
     dialog.cpp \
     binarysampledialog.cpp \
     context.cpp \
-    histogramdialog.cpp
+    histogramdialog.cpp \
+    fftdialog.cpp
 
 HEADERS += \
         mainwindow.hpp \
@@ -41,13 +42,15 @@ HEADERS += \
     binarysampledialog.h \
     app.hpp \
     context.h \
-    histogramdialog.hpp
+    histogramdialog.hpp \
+    fftdialog.hpp
 
 FORMS += \
         mainwindow.ui \
     dialog.ui \
     binarysampledialog.ui \
-    histogramdialog.ui
+    histogramdialog.ui \
+    fftdialog.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../codex/release/ -lcodex
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../codex/debug/ -lcodex

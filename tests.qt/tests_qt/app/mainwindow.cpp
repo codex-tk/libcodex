@@ -13,6 +13,7 @@
 #include <cmath>
 
 #include "histogramdialog.hpp"
+#include "fftdialog.hpp"
 
 std::string path() {
 #if defined( __codex_win32__ )
@@ -208,8 +209,18 @@ void MainWindow::slotShowEvent()
     //ui->label->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
 }
 
+
 void MainWindow::on_image_file_list_clicked(const QModelIndex &index)
 {
+    double re[16];
+    double im[16] = {0};
+    for ( int i = 0 ; i < 16 ; ++i ) {
+        re[i] = i;
+    }
+    codex::vision::fft1d(re,im,8,1);
+    for ( int i = 0 ; i < 16 ; ++i ) {
+        qDebug() << re[i] << ":" << im[i];
+    }
 /*
     int j = 0;
     int n = 8;
@@ -226,7 +237,7 @@ void MainWindow::on_image_file_list_clicked(const QModelIndex &index)
         }
         j += m;
     }
-*/
+
     int N = 8;
     int n = N*2;
     int j = 0;
@@ -246,7 +257,7 @@ void MainWindow::on_image_file_list_clicked(const QModelIndex &index)
         j += m;
     }
 
-
+*/
     index.data().toString();
     _base_image = std::make_shared<QImage>(
                 ":/res/images/" + index.data().toString()
@@ -276,7 +287,7 @@ void MainWindow::on_image_file_list_clicked(const QModelIndex &index)
     for ( int r = 0 ; r < _base_image->height() ; ++r ) {
         memcpy( _image.ptr(r) , _base_image->scanLine(r) , _image.stride() );
     }
-    QTConvinience::bind( ui->image_label , _image );
+    QTConvinience::bind( ui->image_label ,_image );
 }
 
 void MainWindow::on_to_gray_button_clicked()
@@ -370,4 +381,16 @@ void MainWindow::on_pushButton_clicked()
         });
     }
     QTConvinience::bind( ui->image_label , filtered );
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    _image = _image.transpose();
+    QTConvinience::bind(ui->image_label,_image);
+}
+
+void MainWindow::on_fft_button_clicked()
+{
+    FFTDialog* dlg = new FFTDialog(this , _image );
+    dlg->show();
 }
