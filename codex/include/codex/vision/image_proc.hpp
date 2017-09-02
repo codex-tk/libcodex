@@ -196,6 +196,9 @@ namespace codex { namespace vision {
 
     double sqrt( double v );
 
+    void fft1d( double* g , unsigned long N , int isign );
+
+/*
     void _FFT1d(double* g, unsigned long N, int isign)
     {
         int mmax, m, istep;
@@ -263,7 +266,7 @@ namespace codex { namespace vision {
                 g[i] /= N;
             }
         }
-    }
+    }*/
 }}
 
 

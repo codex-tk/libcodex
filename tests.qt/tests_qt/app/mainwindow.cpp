@@ -210,6 +210,43 @@ void MainWindow::slotShowEvent()
 
 void MainWindow::on_image_file_list_clicked(const QModelIndex &index)
 {
+/*
+    int j = 0;
+    int n = 8;
+    int m = 0;
+    for ( int i = 0 ; i < 8 - 1; ++i ) {
+        qDebug() << " i : " << i << " , j :" << j;
+        if ( i  < j ) {
+
+        }
+        m = n >> 1;
+        while ( m <= j ) {
+            j -= m;
+            m >>= 1;
+        }
+        j += m;
+    }
+*/
+    int N = 8;
+    int n = N*2;
+    int j = 0;
+    int m;
+    for (int i=0 ; i<n -1; i+=2)
+    {
+        qDebug() << " i : " << (i - 1) / 2 << " , j :" << (j - 1)/2;
+        if (j > i)
+        {
+        }
+        m = n >> 1;
+        while (j>m && m>=2)
+        {
+            j -= m;
+            m >>= 1;
+        }
+        j += m;
+    }
+
+
     index.data().toString();
     _base_image = std::make_shared<QImage>(
                 ":/res/images/" + index.data().toString()
