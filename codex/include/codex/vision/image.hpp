@@ -62,22 +62,19 @@ namespace codex { namespace vision {
 
         template < typename otherT >
         image_base( const image_base< otherT >& rhs )
-            : _width(rhs._width) , _height(rhs._height) , _channel(rhs._channel)
-            , _stride(((rhs._width * rhs._channel * sizeof(typeT)+3) & ~3 )/sizeof(typeT))
+            : _width(rhs.width()) , _height(rhs.height()) , _channel(rhs.channel())
+            , _stride(((rhs.width() * rhs.channel() * sizeof(typeT)+3) & ~3 )/sizeof(typeT))
             , _buffer( _height * _stride )
         {
             for ( std::size_t r = 0 ; r < _height ; ++r )
             {
-                otherT* src = rhs.ptr(r);
+                const otherT* src = rhs.ptr(r);
                 typeT* dst = this->ptr(r);
                 for ( std::size_t c = 0 ; c < _width ; ++c ) {
-                    std::size_t src_idx = c * _channel;
-                    std::size_t dst_idx  = c * rhs._channel;
-                    for ( std::size_t l = 0
-                          ; l < std::min(_channel,rhs._channel)
-                          ; ++l )
+                    std::size_t idx = c * _channel;
+                    for ( std::size_t l = 0  ; l < _channel ; ++l )
                     {
-                        dst[src_idx + l ] = codex::vision::operation< typeT , otherT>::clip( src[dst_idx + l] );
+                        dst[idx + l ] = codex::vision::operation< typeT , otherT>::clip( src[idx + l] );
                     }
                 }
             }
@@ -99,7 +96,7 @@ namespace codex { namespace vision {
         }
 
         template < typename otherT >
-        void put_channnel( int l , const image_base<otherT>& src , int src_channel = 0 ) {
+        void put_channnel( std::size_t l , const image_base<otherT>& src , std::size_t src_channel = 0 ) {
             if ( l > _channel ) {
                 return ;
             }
@@ -179,11 +176,11 @@ namespace codex { namespace vision {
 
         image_base transpose(void) {
             image_base dst( height() , width() , channel() );
-            for ( int r = 0 ; r < height() ; ++r ) {
+            for ( std::size_t r = 0 ; r < height() ; ++r ) {
                 typeT* src_ptr = ptr(r);
-                for ( int c = 0 ; c < width() ; ++c ) {
+                for ( std::size_t c = 0 ; c < width() ; ++c ) {
                     typeT* dst_ptr = dst.ptr(c);
-                    for ( int l = 0 ; l < channel() ; ++l ) {
+                    for ( std::size_t l = 0 ; l < channel() ; ++l ) {
                         dst_ptr[r * channel() + l ] = src_ptr[c * channel() + l];
                     }
                 }

@@ -27,8 +27,8 @@ private slots:
     void slotShowEvent();
 
 private:
-    Ui::FFTDialog *ui;
     codex::vision::image _orig;
+    Ui::FFTDialog *ui;
     codex::vision::image_base<double> _fft_re;
     codex::vision::image_base<double> _fft_im;
 };

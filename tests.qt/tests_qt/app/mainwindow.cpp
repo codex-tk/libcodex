@@ -391,6 +391,10 @@ void MainWindow::on_pushButton_2_clicked()
 
 void MainWindow::on_fft_button_clicked()
 {
+    if ( _image.channel() != 1 ) {
+        _image =  codex::vision::gray_scale( _image );
+    }
+    QTConvinience::bind( ui->image_label , _image );
     FFTDialog* dlg = new FFTDialog(this , _image );
     dlg->show();
 }

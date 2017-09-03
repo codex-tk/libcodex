@@ -167,6 +167,66 @@ namespace codex { namespace vision {
       return pow( 2.0 , static_cast<int>( x ) );
   }
 
+  void fft_mag_image( const image_base<double>& re , const image_base<double>& im , image_base<uint8_t>& dst ){
+      image_base<double> temp( re.width() , re.height() );
+      double max_mag = 0;
+      for ( std::size_t r = 0 ; r < re.height() ; ++r ) {
+          const double* re_ptr = re.ptr(r);
+          const double* im_ptr = im.ptr(r);
+          double* temp_ptr = temp.ptr(r);
+          for ( std::size_t c = 0 ; c < re.width() ; ++c ) {
+              temp_ptr[c] = log( sqrt( re_ptr[c] * re_ptr[c] + im_ptr[c] * im_ptr[c] ) + 1 );
+              if ( temp_ptr[c] > max_mag ) {
+                  max_mag = temp_ptr[c];
+              }
+          }
+      }
+      for ( std::size_t r = 0 ; r < re.height() ; ++r ) {
+          double* temp_ptr = temp.ptr(r);
+          uint8_t* dst_ptr = dst.ptr(r);
+          for ( std::size_t c = 0 ; c < re.width() ; ++c ) {
+              dst_ptr[c] = static_cast<uint8_t>( temp_ptr[c] * ( 255 / max_mag) );
+          }
+      }
+  }
+
+
+  void fft_phs_image( const image_base<double>& re , const image_base<double>& im , image_base<uint8_t>& dst ){
+      image_base<double> temp( re.width() , re.height() );
+      for ( std::size_t r = 0 ; r < re.height() ; ++r ) {
+          const double* re_ptr = re.ptr(r);
+          const double* im_ptr = im.ptr(r);
+          double* temp_ptr = temp.ptr(r);
+          for ( std::size_t c = 0 ; c < re.width() ; ++c ) {
+              temp_ptr[c] = atan2( im_ptr[c] , re_ptr[c] );
+          }
+      }
+      for ( std::size_t r = 0 ; r < re.height() ; ++r ) {
+          double* temp_ptr = temp.ptr(r);
+          uint8_t* dst_ptr = dst.ptr(r);
+          for ( std::size_t c = 0 ; c < re.width() ; ++c ) {
+              dst_ptr[c] = static_cast<uint8_t>( (temp_ptr[c] * ( 127 / M_PI )) + 128 );
+          }
+      }
+  }
+
+  void fft_shift( image_base<double>& img ) {
+       std::vector<double> swap_buffer( img.stride() );
+       std::size_t rhalf = img.height() / 2;
+       std::size_t chalf = img.width() / 2;
+       for ( std::size_t r = 0 ; r < rhalf ; ++r ) {
+           double* lt = img.ptr(r);
+           double* lm = img.ptr(r + rhalf);
+           // keep lt
+           memcpy( &swap_buffer[0] , lt , img.width() * sizeof(double) );
+
+           memcpy( lt , lm + chalf , chalf * sizeof(double) );               // 4 -> 1
+           memcpy( lt + chalf , lm , chalf * sizeof(double));                // 3 -> 2
+           memcpy( lm , &swap_buffer[0] + chalf , chalf * sizeof(double));  // 2 -> 3
+           memcpy( lm + chalf, &swap_buffer[0] , chalf * sizeof(double) );   // 1 -> 4
+       }
+  }
+
   /*
       namespace detail{
 
