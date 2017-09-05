@@ -203,6 +203,55 @@ namespace codex { namespace vision {
     void fft_phs_image( const image_base<double>& re , const image_base<double>& im , image_base<uint8_t>& dst );
     void fft_shift( image_base<double>& img );
 
+    int clip( int orig , int max ){
+        return orig < 0 ? 0 : orig > max ? max : orig;
+    }
+
+    template < typename typeT >
+    typeT bilinear( const image_base<typeT>& src , double x , double y , std::size_t channel = 0 ){
+        int xl = clip( static_cast<int>(x) , src.width() );
+        int xr = clip( static_cast<int>(x) + 1 , src.width() );
+        int yt = clip( static_cast<int>(y) , src.height() );
+        int yb = clip( static_cast<int>(y) + 1 , src.height() );
+        // 가중치 계산 대각선 방향에의 거리값( 크면 가깞고 , 작으면 멀다 )
+        int lt = ( xr - x )*( yb - y );
+        int rt = ( x - xl )*( yb - y );
+        int lb = ( xr - x )*( y - yt );
+        int rb = ( x - xl )*( y - yt );
+
+        return codex::vision::operation<typeT,typeT>::clip(
+                    lt * src.at(xl,yt,channel )
+                    + rt * src.at(xr,yt,channel)
+                    + lb * src.at(xl,yb,channel)
+                    + rb * src.at(xr,yb,channel)
+                    );
+    }
+
+    template < typename typeT >
+    void tranform( const image_base<typeT>& src , image_base<typeT>& dst
+                   , double rotation // degree
+                   , double scale    // zoom default 1
+                   , double cx       // center src.width() / 2.0
+                   , double cy       // center src.height() / 2.0
+                   , double tx       // trans x
+                   , double ty )     // trans y
+    {
+        double cr = std::cos( rotation * M_PI/180.0 );
+        double sr = std::sin( rotation * M_PI/180.0 );
+
+        for ( std::size_t r = 0 ; r < src.height() ; ++r ) {
+            for ( std::size_t c = 0 ; c < src.width() ; ++c ) {
+                double srcx = scale * ( cr * (c - cx) + sr * ( r -cy )) + cx - tx;
+                double srcy = scale * (-sr * (c - cx) + cr * ( r -cy )) + cy - ty;
+                if ( srcx >= 0 && srcx < src.width() && srcy >= 0 && srcy < src.height() ) {
+                    for ( std::size_t l = 0 ; l < src.channel() ; ++l ) {
+                        dst.at(r,c,l) = bilinear( src , srcx , srcy , l );
+                    }
+                }
+            }
+        }
+    }
+
 /*
     void _FFT1d(double* g, unsigned long N, int isign)
     {
