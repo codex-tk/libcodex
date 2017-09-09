@@ -226,7 +226,9 @@ namespace codex { namespace vision {
            memcpy( lm + chalf, &swap_buffer[0] , chalf * sizeof(double) );   // 1 -> 4
        }
   }
-
+  int clip( int orig , int max ){
+      return orig < 0 ? 0 : orig > max ? max : orig;
+  }
   /*
       namespace detail{
 

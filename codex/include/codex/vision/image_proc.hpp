@@ -203,9 +203,7 @@ namespace codex { namespace vision {
     void fft_phs_image( const image_base<double>& re , const image_base<double>& im , image_base<uint8_t>& dst );
     void fft_shift( image_base<double>& img );
 
-    int clip( int orig , int max ){
-        return orig < 0 ? 0 : orig > max ? max : orig;
-    }
+    int clip( int orig , int max );
 
     template < typename typeT >
     typeT bilinear( const image_base<typeT>& src , double x , double y , std::size_t channel = 0 ){
@@ -220,7 +218,7 @@ namespace codex { namespace vision {
         int rb = ( x - xl )*( y - yt );
 
         return codex::vision::operation<typeT,typeT>::clip(
-                    lt * src.at(xl,yt,channel )
+                    lt * src.at(xl,yt,channel)
                     + rt * src.at(xr,yt,channel)
                     + lb * src.at(xl,yb,channel)
                     + rb * src.at(xr,yb,channel)
@@ -247,6 +245,63 @@ namespace codex { namespace vision {
                     for ( std::size_t l = 0 ; l < src.channel() ; ++l ) {
                         dst.at(r,c,l) = bilinear( src , srcx , srcy , l );
                     }
+                }
+            }
+        }
+    }
+
+    template < typename typeT >
+    void binarization( const image_base<typeT>& src
+                       , image_base<typeT>& dst )
+    {
+        int sum_hi[4] = {0};
+        double cnt_hi[4] = {0};
+        int sum_lo[4] = {0};
+        double cnt_lo[4] = {0};
+        typeT threashold[4] = {0};
+
+        std::size_t channel = src.channel();
+        typeT max_val = std::numeric_limits<typeT>::max();
+
+        int cnt_change = 1;
+        while ( cnt_change ){
+            cnt_change = 0;
+            for ( std::size_t i = 0 ; i < channel ; ++i ) {
+                sum_lo[i] = sum_hi[i] = cnt_hi[i] = cnt_lo[i] = 0;
+            }
+            for ( std::size_t r = 0 ; r < src.height() ; ++r ) {
+                const typeT* src_ptr = src.ptr(r);
+                typeT* dst_ptr = dst.ptr(r);
+                for ( std::size_t c = 0 ; c < src.width() ; ++c ) {
+                    for ( std::size_t l = 0 ; l < channel ; ++l ) {
+                        std::size_t index = c * channel + l;
+                        const typeT val = src_ptr[index];
+                        if ( val > threashold[l] ) {
+                            if ( dst_ptr[index] != max_val)
+                                ++cnt_change;
+                            dst_ptr[index] = max_val;
+                            sum_hi[l] += src_ptr[index];
+                            cnt_hi[l] += 1;
+                        } else {
+                            if ( dst_ptr[index] != 0 )
+                                ++cnt_change;
+                            dst_ptr[index] = 0;
+                            sum_lo[l] += src_ptr[index];
+                            cnt_lo[l] += 1;
+                        }
+                    }
+                }
+            }
+            for ( std::size_t i = 0 ; i < channel ; ++i ) {
+                if ( sum_hi[i] == 0 ) {
+                    threashold[i] = sum_lo[i] / cnt_lo[i];
+                } else if ( sum_lo[i] == 0 ) {
+                    threashold[i] = sum_hi[i] / cnt_hi[i];
+                } else {
+                    int hi = sum_hi[i] / cnt_hi[i];
+                    int lo = sum_lo[i] / cnt_lo[i];
+                    int avg = (hi + lo )/ 2;
+                    threashold[i] = avg;
                 }
             }
         }

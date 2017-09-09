@@ -212,52 +212,7 @@ void MainWindow::slotShowEvent()
 
 void MainWindow::on_image_file_list_clicked(const QModelIndex &index)
 {
-    double re[16];
-    double im[16] = {0};
-    for ( int i = 0 ; i < 16 ; ++i ) {
-        re[i] = i;
-    }
-    codex::vision::fft1d(re,im,8,1);
-    for ( int i = 0 ; i < 16 ; ++i ) {
-        qDebug() << re[i] << ":" << im[i];
-    }
-/*
-    int j = 0;
-    int n = 8;
-    int m = 0;
-    for ( int i = 0 ; i < 8 - 1; ++i ) {
-        qDebug() << " i : " << i << " , j :" << j;
-        if ( i  < j ) {
 
-        }
-        m = n >> 1;
-        while ( m <= j ) {
-            j -= m;
-            m >>= 1;
-        }
-        j += m;
-    }
-
-    int N = 8;
-    int n = N*2;
-    int j = 0;
-    int m;
-    for (int i=0 ; i<n -1; i+=2)
-    {
-        qDebug() << " i : " << (i - 1) / 2 << " , j :" << (j - 1)/2;
-        if (j > i)
-        {
-        }
-        m = n >> 1;
-        while (j>m && m>=2)
-        {
-            j -= m;
-            m >>= 1;
-        }
-        j += m;
-    }
-
-*/
     index.data().toString();
     _base_image = std::make_shared<QImage>(
                 ":/res/images/" + index.data().toString()
@@ -361,7 +316,7 @@ void MainWindow::on_pushButton_clicked()
     }
     if ( ui->filter_combobox->currentText() ==   "laplacian4" ) {
         codex::vision::detail::filter( _image , filtered , codex::vision::laplacian ,[]( double val ) -> uint8_t {
-            return static_cast<uint8_t>( abs(val));
+            return static_cast<uint8_t>( std::abs(val));
             //return codex::vision::operation< uint8_t , double >::clip( val + 128 );
         });
     }
@@ -397,4 +352,20 @@ void MainWindow::on_fft_button_clicked()
     QTConvinience::bind( ui->image_label , _image );
     FFTDialog* dlg = new FFTDialog(this , _image );
     dlg->show();
+}
+
+
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    codex::vision::image img(_image.width() , _image.height() , _image.channel());
+    if ( _image.channel() == 4 ) {
+        codex::vision::image alpha = _image.get_channel(3);
+        codex::vision::binarization( _image , img );
+        img.put_channnel( 3 , alpha );
+        QTConvinience::bind( ui->image_label , img );
+    }else{
+        codex::vision::binarization( _image , img );
+        QTConvinience::bind( ui->image_label , img );
+    }
 }

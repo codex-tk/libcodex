@@ -56,9 +56,12 @@ set( HEADERS
   	include/codex/conv/crc32.hpp
   	include/codex/conv/string.hpp
 		include/codex/singleton.hpp
+    include/codex/vision/vision.hpp
     include/codex/vision/image.hpp
     include/codex/vision/bitmap.hpp
     include/codex/vision/image_proc.hpp
+    include/codex/vision/kernel.hpp
+    include/codex/vision/image_draw.hpp
     ${PLATFORM_DEPEND_HEADERS}
     )
 
@@ -71,6 +74,7 @@ set( SRCS
     srcs/vision/image.cpp
     srcs/vision/bitmap.cpp
     srcs/vision/image_proc.cpp
+    srcs/vision/image_draw.cpp
     ${PLATFORM_DEPEND_SRCS}
     )
 

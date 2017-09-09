@@ -81,7 +81,7 @@ int hammingDistance(int x, int y) {
     int dist = 0;
     for ( int i = 0 ; i < len ; ++i ) {
         int mask = 1 << i;
-        if ( x & mask != y & mask )
+        if ( (x & mask) != ( y & mask ) )
             ++dist;
     }
     return dist;
