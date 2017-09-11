@@ -7,13 +7,12 @@
 namespace  codex { namespace vision {
 
 #pragma pack(1)
-struct bitmap_file_header                       // Bitmap file header
-{
-    uint16_t type;            // Used to identify the BMP and DIB file is 0x42 0x4D in hexadecimal, same as BM in ASCII
-    uint32_t size;            // size of the BMP file in bytes
-    uint16_t reserved1;       // Reserved; actual value depends on the application that creates the image
-    uint16_t reserved2;       // "                                                                       "
-    uint32_t offbits;         // offset, i.e. starting address, of the byte where the bitmap image data (pixel array) can be found
+struct bitmap_file_header{      // Bitmap file header
+    uint16_t type;              // Used to identify the BMP and DIB file is 0x42 0x4D in hexadecimal, same as BM in ASCII
+    uint32_t size;              // size of the BMP file in bytes
+    uint16_t reserved1;         // Reserved; actual value depends on the application that creates the image
+    uint16_t reserved2;         // "                                                                       "
+    uint32_t offbits;           // offset, i.e. starting address, of the byte where the bitmap image data (pixel array) can be found
 };
 
 struct bitmap_info_header {

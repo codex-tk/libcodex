@@ -4,6 +4,7 @@
 #include <cassert>
 #include <array>
 #include <codex/vision/kernel.hpp>
+#include <codex/vision/fft.hpp>
 #include <cmath>
 
 namespace codex { namespace vision {
@@ -196,14 +197,7 @@ namespace codex { namespace vision {
 
     double sqrt( double v );
 
-    void fft1d( double* re , double* im , int N , int isign );
-    int fft_size( int n );
-
-    void fft_mag_image( const image_base<double>& re , const image_base<double>& im , image_base<uint8_t>& dst );
-    void fft_phs_image( const image_base<double>& re , const image_base<double>& im , image_base<uint8_t>& dst );
-    void fft_shift( image_base<double>& img );
-
-    int clip( int orig , int max );
+      int clip( int orig , int max );
 
     template < typename typeT >
     typeT bilinear( const image_base<typeT>& src , double x , double y , std::size_t channel = 0 ){
@@ -307,75 +301,77 @@ namespace codex { namespace vision {
         }
     }
 
-/*
-    void _FFT1d(double* g, unsigned long N, int isign)
+    template < typename typeT >
+    void kmeans( const image_base<typeT>& src , image_base<typeT>& dst
+               , std::vector< std::vector<typeT> >& means )
     {
-        int mmax, m, istep;
-        double wtemp, wr, wpr, wpi, wi, theta;
-        double tempr, tempi;
-        double temp;
+        std::vector< std::vector<int> > sums;
+        std::vector< std::vector<int> > cnts;
 
-        // 스크램블 수행
-        int n = N*2;
-        int j = 1;
-        for (int i=1 ; i<n ; i+=2)
-        {
-            if (j > i)
-            {
-                temp = g[j];
-                g[j] = g[i];
-                g[i] = temp;
-
-                temp = g[j+1];
-                g[j+1] = g[i+1];
-                g[i+1] = temp;
+        for ( std::size_t k = 0 ; k < means.size() ; ++k ) {
+            sums.push_back(std::vector<int>());
+            cnts.push_back(std::vector<int>());
+            for ( std::size_t l = 0 ; l < means[k].size() ; ++l ){
+                sums[k].push_back(0);
+                cnts[k].push_back(0);
             }
-            m = n >> 1;
-            while (j>m && m>=2)
-            {
-                j -= m;
-                m >>= 1;
-            }
-            j += m;
         }
 
-        // 버터플라이 알고리즘 수행
-        mmax = 2; // 2원소 DFT로 시작
-        while (n > mmax)
-        {
-            istep = mmax << 1;
-            theta = isign*(6.28318530717959/mmax);
-            wtemp = sin(0.5*theta);
-            wpr = -2.0*wtemp*wtemp;
-            wpi = sin(theta);
-            wr = 1.0;
-            wi = 0.0;
-            for (m=1 ; m<mmax ; m+=2)
-            {
-                for (int i=m ; i<=n ; i+=istep)
-                {
-                    j = i + mmax;
-                    tempr = double (wr*g[j]-wi*g[j+1]);
-                    tempi = double (wr*g[j+1]+wi*g[j]);
-                    g[j] = g[i]-tempr;
-                    g[j+1] = g[i+1]-tempi;
-                    g[i] += tempr;
-                    g[i+1] += tempi;
+        bool changed = true;
+        while ( changed ) {
+            changed = false;
+
+            std::vector< int > temp;
+
+            for ( std::size_t r = 0 ; r < src.height() ; ++r ) {
+                const typeT* src_ptr = src.ptr(r);
+                typeT* dst_ptr = dst.ptr(r);
+                for ( std::size_t c = 0 ; c < src.width() ; ++c ) {
+                    int min_diff = std::numeric_limits<int>::max();
+                    int new_k = 0;
+                    for ( std::size_t k = 0 ; k < means.size() ; ++k ) {
+                        int dist = 0;
+                        for ( std::size_t l = 0 ; l < src.channel() ; ++l ) {
+                            typeT val = src_ptr[ c * src.channel() + l ];
+                            int diff = val - means[k][l];
+                            dist += ( diff * diff );
+                        }
+                        if ( dist < min_diff ) {
+                            min_diff = dist;
+                            new_k = k;
+                        }
+                    }
+                    if ( dst_ptr[ c * dst.channel()] != new_k ) {
+                        dst_ptr[ c * dst.channel()] = new_k;
+                        changed = true;
+                    }
+                    for ( std::size_t l = 0 ; l < src.channel() ; ++l ) {
+                        const typeT val = src_ptr[ c * src.channel() + l ];
+                        sums[new_k][l] += val;
+                        cnts[new_k][l] += 1;
+                    }
                 }
-                wr = (wtemp=wr)*wpr-wi*wpi+wr;
-                wi = wi*wpr+wtemp*wpi+wi;
             }
-            mmax = istep;
+            for ( std::size_t k = 0 ; k < means.size() ; ++k ) {
+                for ( std::size_t l = 0 ; l < src.channel() ; ++l ) {
+                    means[k][l] = sums[k][l] / cnts[k][l];
+                    sums[k][l] = 0;
+                    cnts[k][l] = 0;
+                }
+            }
         }
 
-        if(isign == -1)
-        {
-            for (int i=1 ; i<= n ; i++)
-            {
-                g[i] /= N;
+        for ( std::size_t r = 0 ; r < src.height() ; ++r ) {
+            typeT* dst_ptr = dst.ptr(r);
+            for ( std::size_t c = 0 ; c < src.width() ; ++c ) {
+                int k = dst_ptr[c*dst.channel()];
+                for ( std::size_t l = 0 ; l < src.channel() ; ++l ) {
+                    dst_ptr[ c * dst.channel() + l ] = means[k][l];
+                }
             }
         }
-    }*/
+    }
+
 }}
 
 

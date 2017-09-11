@@ -80,7 +80,7 @@ namespace codex { namespace vision {
             }
         }
 
-        image_base<typeT> get_channel( int l ) {
+        image_base<typeT> get_channel( std::size_t l ) {
             if ( l > _channel ) {
                 return image_base<typeT>();
             }
