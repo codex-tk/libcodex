@@ -25,9 +25,9 @@ void fft1d( double* re , double* im , int N , int isign ){
 
     mmax = 2;
     while ( mmax <= N ) {
-        theta = isign*(6.28318530717959/mmax);
-        wtemp = sin(0.5*theta);
-        wpr = -2.0*wtemp*wtemp;
+        theta = isign * ( 6.28318530717959 / mmax );
+        wtemp = sin( 0.5 * theta );
+        wpr = -2.0 * wtemp * wtemp;
         wpi = sin(theta);
         wr = 1.0;
         wi = 0.0;
@@ -35,22 +35,21 @@ void fft1d( double* re , double* im , int N , int isign ){
         for ( m = 0 ; m <step ; ++m ) {
             for ( int i = m ; i < N ; i += mmax ) {
                 j = i + step;
-                tempr = double (wr*re[j]-wi*im[j]);
-                tempi = double (wr*im[j]+wi*re[j]);
+                tempr = static_cast<double>( wr * re[j] - wi * im[j] );
+                tempi = static_cast<double>( wr * im[j] + wi * re[j] );
                 re[j] = re[i]-tempr;
                 im[j] = im[i]-tempi;
                 re[i] += tempr;
                 im[i] += tempi;
             }
-            wr = (wtemp=wr)*wpr-wi*wpi+wr;
-            wi = wi*wpr+wtemp*wpi+wi;
+            wtemp = wr;
+            wr = wtemp * wpr - wi * wpi + wr;
+            wi = wi * wpr + wtemp * wpi + wi;
         }
         mmax <<= 1;
     }
-    if(isign == -1)
-    {
-        for (int i=0 ; i< N; i++)
-        {
+    if(isign == -1){
+        for (int i=0 ; i< N; i++){
             re[i] /= N;
             im[i] /= N;
         }
@@ -123,6 +122,33 @@ void fft_shift( image_base<double>& img ) {
          memcpy( lm , &swap_buffer[0] + chalf , chalf * sizeof(double));  // 2 -> 3
          memcpy( lm + chalf, &swap_buffer[0] , chalf * sizeof(double) );   // 1 -> 4
      }
+}
+
+void fft( const image_base<uint8_t>& gray_image
+  , image_base<double>& fft_re
+  , image_base<double>& fft_im )
+{
+  fft_re = codex::vision::image_base<double>(
+              codex::vision::fft_size( gray_image.width() )
+              , codex::vision::fft_size( gray_image.height())
+              , 1 );
+  fft_im = codex::vision::image_base<double>(
+              codex::vision::fft_size( gray_image.width() )
+              , codex::vision::fft_size( gray_image.height())
+              , 1 );
+  fft_re.reset(0);
+  fft_im.reset(0);
+  fft_re.put_channnel( 0 , gray_image , 0 );
+  for ( std::size_t r = 0 ; r < fft_re.height() ; ++r ) {
+      codex::vision::fft1d( fft_re.ptr(r) , fft_im.ptr(r) , fft_re.width() , 1 );
+  }
+  fft_re = fft_re.transpose();
+  fft_im = fft_im.transpose();
+  for ( std::size_t r = 0 ; r < fft_re.height() ; ++r ) {
+      codex::vision::fft1d( fft_re.ptr(r) , fft_im.ptr(r) , fft_re.width() , 1 );
+  }
+  fft_re = fft_re.transpose();
+  fft_im = fft_im.transpose();
 }
 
 }}

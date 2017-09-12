@@ -19,6 +19,10 @@ void fft_phs_image( const image_base<double>& re
 
 void fft_shift( image_base<double>& img );
 
+void fft( const image_base<uint8_t>& gray_image
+  , image_base<double>& fft_re
+  , image_base<double>& fft_im );
+
 }}
 
 

@@ -8,6 +8,7 @@ FFTDialog::FFTDialog(QWidget *parent , codex::vision::image& img) :
     ui(new Ui::FFTDialog)
 {
     ui->setupUi(this);
+    /*
     _fft_re = codex::vision::image_base<double>(
                 codex::vision::fft_size( _orig.width() )
                 , codex::vision::fft_size( _orig.height())
@@ -18,7 +19,7 @@ FFTDialog::FFTDialog(QWidget *parent , codex::vision::image& img) :
                 , 1 );
     _fft_re.reset(0);
     _fft_im.reset(0);
-
+*/
     connect(this
             , SIGNAL(sigShowEvent())
             , this
@@ -44,6 +45,7 @@ void FFTDialog::slotShowEvent()
 
 void FFTDialog::on_pushButton_clicked()
 {
+  /*
     _fft_re.reset(0);
     _fft_im.reset(0);
     _fft_re.put_channnel( 0 , _orig , 0 );
@@ -57,7 +59,8 @@ void FFTDialog::on_pushButton_clicked()
     }
     _fft_re = _fft_re.transpose();
     _fft_im = _fft_im.transpose();
-
+*/
+    codex::vision::fft( _orig , _fft_re , _fft_im );
     codex::vision::image fft_img( _fft_re.width(), _fft_re.height() );
     codex::vision::image fft_img_phs( _fft_re.width(), _fft_re.height() );
 

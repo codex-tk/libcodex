@@ -62,6 +62,7 @@ set( HEADERS
     include/codex/vision/image_proc.hpp
     include/codex/vision/kernel.hpp
     include/codex/vision/image_draw.hpp
+    include/codex/vision/fft.hpp
     ${PLATFORM_DEPEND_HEADERS}
     )
 
@@ -75,6 +76,7 @@ set( SRCS
     srcs/vision/bitmap.cpp
     srcs/vision/image_proc.cpp
     srcs/vision/image_draw.cpp
+    srcs/vision/fft.cpp
     ${PLATFORM_DEPEND_SRCS}
     )
 
