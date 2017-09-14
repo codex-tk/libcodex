@@ -9,11 +9,14 @@
 
 #include <codex/vision/image_proc.hpp>
 #include <codex/vision/image_draw.hpp>
+
+#include <codex/function.hpp>
 #include "qtconvinience.hpp"
 #include <cmath>
 
 #include "histogramdialog.hpp"
 #include "fftdialog.hpp"
+#include "kmeandialog.h"
 
 std::string path() {
 #if defined( __codex_win32__ )
@@ -31,35 +34,40 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QStringListModel* model = new QStringListModel(this);
-
-    QDir res_dir = QDir(":/res/images/");
-    res_dir.setNameFilters(QStringList() << "*.jpg" << "*.png" << "*.bmp");
-
-    model->setStringList(res_dir.entryList());
-
-    ui->image_file_list->setModel(model );
-
-
-    model = new QStringListModel(this);
-    QStringList lists;
-    lists.append( "prewittX" );
-    lists.append( "prewittY" );
-    lists.append( "sobleX" );
-    lists.append( "sobleY" );
-    lists.append( "emboss1" );
-    lists.append( "emboss2" );
-    lists.append( "laplacian4" );
-    lists.append( "laplacian8" );
-    lists.append( "unsharp4" );
-    lists.append( "unsharp8" );
-    model->setStringList(lists);
-    ui->filter_combobox->setModel(model);
 
     connect(this
             , SIGNAL(sigShowEvent())
             , this
             , SLOT(slotShowEvent()));
+
+    // test
+    codex::function< void () > func([&] {
+        QStringListModel* model = new QStringListModel(this);
+
+        QDir res_dir = QDir(":/res/images/");
+        res_dir.setNameFilters(QStringList() << "*.jpg" << "*.png" << "*.bmp");
+
+        model->setStringList(res_dir.entryList());
+
+        ui->image_file_list->setModel(model );
+
+        model = new QStringListModel(this);
+        QStringList lists;
+        lists.append( "prewittX" );
+        lists.append( "prewittY" );
+        lists.append( "sobleX" );
+        lists.append( "sobleY" );
+        lists.append( "emboss1" );
+        lists.append( "emboss2" );
+        lists.append( "laplacian4" );
+        lists.append( "laplacian8" );
+        lists.append( "unsharp4" );
+        lists.append( "unsharp8" );
+        model->setStringList(lists);
+        ui->filter_combobox->setModel(model);
+    });
+
+    func();
 }
 
 MainWindow::~MainWindow()
@@ -368,4 +376,10 @@ void MainWindow::on_pushButton_3_clicked()
         codex::vision::binarization( _image , img );
         QTConvinience::bind( ui->image_label , img );
     }
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    KMeanDialog* dlg = new KMeanDialog(this , _image );
+    dlg->show();
 }

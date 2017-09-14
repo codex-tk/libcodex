@@ -220,13 +220,14 @@ namespace codex { namespace vision {
     }
 
     template < typename typeT >
-    void tranform( const image_base<typeT>& src , image_base<typeT>& dst
-                   , double rotation // degree
-                   , double scale    // zoom default 1
-                   , double cx       // center src.width() / 2.0
-                   , double cy       // center src.height() / 2.0
-                   , double tx       // trans x
-                   , double ty )     // trans y
+    void tranform( const image_base<typeT>& src //
+                   , image_base<typeT>& dst     //
+                   , double rotation            // degree
+                   , double scale               // zoom default 1
+                   , double cx                  // center src.width() / 2.0
+                   , double cy                  // center src.height() / 2.0
+                   , double tx                  // trans x
+                   , double ty )                // trans y
     {
         double cr = std::cos( rotation * M_PI/180.0 );
         double sr = std::sin( rotation * M_PI/180.0 );
@@ -320,9 +321,6 @@ namespace codex { namespace vision {
         bool changed = true;
         while ( changed ) {
             changed = false;
-
-            std::vector< int > temp;
-
             for ( std::size_t r = 0 ; r < src.height() ; ++r ) {
                 const typeT* src_ptr = src.ptr(r);
                 typeT* dst_ptr = dst.ptr(r);

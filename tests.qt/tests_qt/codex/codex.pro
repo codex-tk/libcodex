@@ -30,6 +30,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 HEADERS += \
         $$CODEX_INCLUDE_DIR/codex.hpp\
         $$CODEX_INCLUDE_DIR/error_code.hpp\
+        $$CODEX_INCLUDE_DIR/function.hpp\
+        $$CODEX_INCLUDE_DIR/function.ipp\
         $$CODEX_INCLUDE_DIR/vision/image.hpp\
         $$CODEX_INCLUDE_DIR/vision/bitmap.hpp\
         $$CODEX_INCLUDE_DIR/vision/vision.hpp\

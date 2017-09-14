@@ -56,6 +56,8 @@ set( HEADERS
   	include/codex/conv/crc32.hpp
   	include/codex/conv/string.hpp
 		include/codex/singleton.hpp
+		include/codex/buffer/ctrl_blk.hpp
+		include/codex/buffer/shared_blk.hpp
     include/codex/vision/vision.hpp
     include/codex/vision/image.hpp
     include/codex/vision/bitmap.hpp
@@ -72,6 +74,8 @@ set( SRCS
     srcs/conv/base64.cpp
     srcs/conv/crc32.cpp
     srcs/conv/string.cpp
+		srcs/buffer/ctrl_blk.cpp
+		srcs/buffer/shared_blk.cpp
     srcs/vision/image.cpp
     srcs/vision/bitmap.cpp
     srcs/vision/image_proc.cpp
