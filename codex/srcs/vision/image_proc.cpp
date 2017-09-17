@@ -3,7 +3,7 @@
 #include <cmath>
 namespace codex { namespace vision {
 
-  void histogram_equation( const image& src , image& dst ,const std::size_t channel )
+  void equalize_hist( const image& src , image& dst ,const std::size_t channel )
   {
       int hist[256] = {0};
       int norm[256] = {0};
@@ -32,7 +32,7 @@ namespace codex { namespace vision {
       }
   }
 
-  void histogram_equation_debug( const image& src
+  void equalize_hist_debug( const image& src
                                  , image& dst
                                  , image& orig_hist
                                  , image& equation_hist )

@@ -34,7 +34,7 @@ void HistogramDialog::showEvent(QShowEvent *ev)
 void HistogramDialog::slotShowEvent()
 {
     codex::vision::image hist( _image.width() , _image.height() , _image.channel());
-    codex::vision::histogram_equation( _image , hist );
+    codex::vision::equalize_hist( _image , hist );
     QTConvinience::bind(ui->origin , _image);
     QTConvinience::bind(ui->hist , hist );
 

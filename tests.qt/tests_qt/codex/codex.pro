@@ -39,6 +39,8 @@ HEADERS += \
         $$CODEX_INCLUDE_DIR/vision/image_proc.hpp\
         $$CODEX_INCLUDE_DIR/vision/image_draw.hpp\
         $$CODEX_INCLUDE_DIR/vision/fft.hpp\
+        $$CODEX_INCLUDE_DIR/vision/sobel.hpp\
+        $$CODEX_INCLUDE_DIR/vision/canny.hpp\
 
 SOURCES += \
         $$CODEX_SRCS_DIR/codex.cpp\
@@ -47,7 +49,8 @@ SOURCES += \
         $$CODEX_SRCS_DIR/vision/bitmap.cpp\
         $$CODEX_SRCS_DIR/vision/image_proc.cpp\
         $$CODEX_SRCS_DIR/vision/image_draw.cpp\
-        $$CODEX_SRCS_DIR/vision/fft.cpp
+        $$CODEX_SRCS_DIR/vision/fft.cpp\
+        $$CODEX_SRCS_DIR/vision/canny.cpp
 
 unix {
     target.path = /usr/lib

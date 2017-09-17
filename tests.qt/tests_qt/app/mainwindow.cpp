@@ -9,6 +9,8 @@
 
 #include <codex/vision/image_proc.hpp>
 #include <codex/vision/image_draw.hpp>
+#include <codex/vision/sobel.hpp>
+#include <codex/vision/canny.hpp>
 
 #include <codex/function.hpp>
 #include "qtconvinience.hpp"
@@ -382,4 +384,22 @@ void MainWindow::on_pushButton_4_clicked()
 {
     KMeanDialog* dlg = new KMeanDialog(this , _image );
     dlg->show();
+}
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    codex::vision::image gray = codex::vision::gray_scale( _image );
+    codex::vision::image sobel_img(gray.width(),gray.height());
+    codex::vision::sobel_edge(gray,sobel_img);
+
+    QTConvinience::bind( ui->image_label , sobel_img );
+}
+
+void MainWindow::on_pushButton_6_clicked()
+{
+     codex::vision::image gray = codex::vision::gray_scale( _image );
+     codex::vision::image canny_image(gray.width(),gray.height());
+     codex::vision::canny_edge( gray , canny_image , 150 , 100 );
+
+     QTConvinience::bind( ui->image_label , canny_image );
 }

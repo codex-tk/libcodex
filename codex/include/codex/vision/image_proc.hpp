@@ -35,8 +35,8 @@ namespace codex { namespace vision {
         return dst;
     }
 
-    void histogram_equation( const image& src , image& dst , const std::size_t channel = 0);
-    void histogram_equation_debug( const image& src
+    void equalize_hist( const image& src , image& dst , const std::size_t channel = 0);
+    void equalize_hist_debug( const image& src
                                    , image& dst
                                    , image& orig_hist
                                    , image& equation_hist );
