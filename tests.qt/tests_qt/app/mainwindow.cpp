@@ -12,7 +12,7 @@
 #include <codex/vision/sobel.hpp>
 #include <codex/vision/canny.hpp>
 #include <codex/vision/hough.hpp>
-
+#include <codex/vision/harris.hpp>
 #include <codex/vision/image_draw.hpp>
 
 #include <codex/function.hpp>
@@ -416,10 +416,27 @@ void MainWindow::on_pushButton_7_clicked()
 
     std::vector< codex::vision::hough_line_result > res;
 
-    codex::vision::hough_line( canny_image , 150 , 200 , 1.0 , res );
+    codex::vision::hough_line( canny_image , 100 , 200 , 1.0 , res );
     for ( std::size_t i = 0 ; i < res.size() ; ++i ) {
          codex::vision::line_to( canny_image , res[i].from() , res[i].to() , 0x7f );
     }
     QTConvinience::bind( ui->image_label , canny_image );
 
+}
+
+void MainWindow::on_pushButton_8_clicked()
+{
+    codex::vision::image gray = codex::vision::gray_scale( _image );
+    std::vector< codex::vision::point > points;
+    codex::vision::harris_corner( gray , 1e8 , 0.04 , points );
+
+    for ( std::size_t i = 0 ; i < points.size() ; ++i ) {
+        codex::vision::point p1 { points[i].x - 1 , points[i].y };
+        codex::vision::point p2 { points[i].x + 1 , points[i].y };
+        codex::vision::point p3 { points[i].x , points[i].y - 1};
+        codex::vision::point p4 { points[i].x , points[i].y + 1};
+        codex::vision::line_to( gray , p1 , p2 , 0xff );
+        codex::vision::line_to( gray , p3 , p4 , 0xff );
+    }
+    QTConvinience::bind( ui->image_label , gray );
 }

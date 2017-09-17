@@ -58,6 +58,8 @@ private slots:
 
     void on_pushButton_7_clicked();
 
+    void on_pushButton_8_clicked();
+
 private:
   Ui::MainWindow *ui;
   std::shared_ptr< QImage > _base_image;

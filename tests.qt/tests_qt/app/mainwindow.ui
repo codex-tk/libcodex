@@ -114,6 +114,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_8">
+        <property name="text">
+         <string>HarrisCorner</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item row="2" column="0">

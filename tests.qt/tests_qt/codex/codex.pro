@@ -41,7 +41,8 @@ HEADERS += \
         $$CODEX_INCLUDE_DIR/vision/fft.hpp\
         $$CODEX_INCLUDE_DIR/vision/sobel.hpp\
         $$CODEX_INCLUDE_DIR/vision/canny.hpp\
-        $$CODEX_INCLUDE_DIR/vision/hough.hpp
+        $$CODEX_INCLUDE_DIR/vision/hough.hpp\
+        $$CODEX_INCLUDE_DIR/vision/harris.hpp
 
 SOURCES += \
         $$CODEX_SRCS_DIR/codex.cpp\
@@ -52,7 +53,8 @@ SOURCES += \
         $$CODEX_SRCS_DIR/vision/image_draw.cpp\
         $$CODEX_SRCS_DIR/vision/fft.cpp\
         $$CODEX_SRCS_DIR/vision/canny.cpp\
-        $$CODEX_SRCS_DIR/vision/hough.cpp
+        $$CODEX_SRCS_DIR/vision/hough.cpp\
+        $$CODEX_SRCS_DIR/vision/harris.cpp
 
 unix {
     target.path = /usr/lib
