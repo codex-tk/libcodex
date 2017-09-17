@@ -399,7 +399,7 @@ void MainWindow::on_pushButton_6_clicked()
 {
      codex::vision::image gray = codex::vision::gray_scale( _image );
      codex::vision::image canny_image(gray.width(),gray.height());
-     codex::vision::canny_edge( gray , canny_image , 150 , 100 );
+     codex::vision::canny_edge( gray , canny_image , 60 , 30 );
 
      QTConvinience::bind( ui->image_label , canny_image );
 }
