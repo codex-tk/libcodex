@@ -11,6 +11,9 @@
 #include <codex/vision/image_draw.hpp>
 #include <codex/vision/sobel.hpp>
 #include <codex/vision/canny.hpp>
+#include <codex/vision/hough.hpp>
+
+#include <codex/vision/image_draw.hpp>
 
 #include <codex/function.hpp>
 #include "qtconvinience.hpp"
@@ -402,4 +405,21 @@ void MainWindow::on_pushButton_6_clicked()
      codex::vision::canny_edge( gray , canny_image , 60 , 30 );
 
      QTConvinience::bind( ui->image_label , canny_image );
+}
+
+void MainWindow::on_pushButton_7_clicked()
+{
+    codex::vision::image gray = codex::vision::gray_scale( _image );
+
+    codex::vision::image canny_image(gray.width(),gray.height());
+    codex::vision::canny_edge( gray , canny_image , 60 , 30 );
+
+    std::vector< codex::vision::hough_line_result > res;
+
+    codex::vision::hough_line( canny_image , 150 , 200 , 1.0 , res );
+    for ( std::size_t i = 0 ; i < res.size() ; ++i ) {
+         codex::vision::line_to( canny_image , res[i].from() , res[i].to() , 0x7f );
+    }
+    QTConvinience::bind( ui->image_label , canny_image );
+
 }
