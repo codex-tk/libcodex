@@ -249,19 +249,10 @@ namespace codex { namespace vision {
             }
         }
     }
-<<<<<<< HEAD
-    /*
-    template < typename typeT >
-    void rgb_to_hsv( const image_base<typeT>& rgb , image_base<typeT>& dst )
-*/
-/*
-    void _FFT1d(double* g, unsigned long N, int isign)
-=======
 
     template < typename typeT >
     void binarization( const image_base<typeT>& src
                        , image_base<typeT>& dst )
->>>>>>> 637da8ed269385bce254ddac6b91fcd97a06f02c
     {
         int sum_hi[4] = {0};
         double cnt_hi[4] = {0};
