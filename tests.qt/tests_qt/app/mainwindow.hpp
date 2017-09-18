@@ -48,6 +48,18 @@ private slots:
 
     void on_fft_button_clicked();
 
+    void on_pushButton_3_clicked();
+
+    void on_pushButton_4_clicked();
+
+    void on_pushButton_5_clicked();
+
+    void on_pushButton_6_clicked();
+
+    void on_pushButton_7_clicked();
+
+    void on_pushButton_8_clicked();
+
 private:
   Ui::MainWindow *ui;
   std::shared_ptr< QImage > _base_image;

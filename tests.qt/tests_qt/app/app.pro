@@ -33,7 +33,9 @@ SOURCES += \
     binarysampledialog.cpp \
     context.cpp \
     histogramdialog.cpp \
-    fftdialog.cpp
+    fftdialog.cpp \
+    kmeandialog.cpp \
+    mouseeventsignaler.cpp
 
 HEADERS += \
         mainwindow.hpp \
@@ -43,14 +45,17 @@ HEADERS += \
     app.hpp \
     context.h \
     histogramdialog.hpp \
-    fftdialog.hpp
+    fftdialog.hpp \
+    kmeandialog.h \
+    mouseeventsignaler.h
 
 FORMS += \
         mainwindow.ui \
     dialog.ui \
     binarysampledialog.ui \
     histogramdialog.ui \
-    fftdialog.ui
+    fftdialog.ui \
+    kmeandialog.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../codex/release/ -lcodex
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../codex/debug/ -lcodex

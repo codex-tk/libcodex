@@ -86,5 +86,8 @@
         <file>images/tmpl.png</file>
         <file>images/image.bmp</file>
         <file>images/012813_0424_FFT5.jpg</file>
+        <file>images/525.jpg</file>
+        <file>images/534_2.jpg</file>
+        <file>images/534_2_1.png</file>
     </qresource>
 </RCC>

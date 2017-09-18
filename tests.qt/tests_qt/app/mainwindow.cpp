@@ -9,11 +9,19 @@
 
 #include <codex/vision/image_proc.hpp>
 #include <codex/vision/image_draw.hpp>
+#include <codex/vision/sobel.hpp>
+#include <codex/vision/canny.hpp>
+#include <codex/vision/hough.hpp>
+#include <codex/vision/harris.hpp>
+#include <codex/vision/image_draw.hpp>
+
+#include <codex/function.hpp>
 #include "qtconvinience.hpp"
 #include <cmath>
 
 #include "histogramdialog.hpp"
 #include "fftdialog.hpp"
+#include "kmeandialog.h"
 
 std::string path() {
 #if defined( __codex_win32__ )
@@ -31,35 +39,40 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QStringListModel* model = new QStringListModel(this);
-
-    QDir res_dir = QDir(":/res/images/");
-    res_dir.setNameFilters(QStringList() << "*.jpg" << "*.png" << "*.bmp");
-
-    model->setStringList(res_dir.entryList());
-
-    ui->image_file_list->setModel(model );
-
-
-    model = new QStringListModel(this);
-    QStringList lists;
-    lists.append( "prewittX" );
-    lists.append( "prewittY" );
-    lists.append( "sobleX" );
-    lists.append( "sobleY" );
-    lists.append( "emboss1" );
-    lists.append( "emboss2" );
-    lists.append( "laplacian4" );
-    lists.append( "laplacian8" );
-    lists.append( "unsharp4" );
-    lists.append( "unsharp8" );
-    model->setStringList(lists);
-    ui->filter_combobox->setModel(model);
 
     connect(this
             , SIGNAL(sigShowEvent())
             , this
             , SLOT(slotShowEvent()));
+
+    // test
+    codex::function< void () > func([&] {
+        QStringListModel* model = new QStringListModel(this);
+
+        QDir res_dir = QDir(":/res/images/");
+        res_dir.setNameFilters(QStringList() << "*.jpg" << "*.png" << "*.bmp");
+
+        model->setStringList(res_dir.entryList());
+
+        ui->image_file_list->setModel(model );
+
+        model = new QStringListModel(this);
+        QStringList lists;
+        lists.append( "prewittX" );
+        lists.append( "prewittY" );
+        lists.append( "sobleX" );
+        lists.append( "sobleY" );
+        lists.append( "emboss1" );
+        lists.append( "emboss2" );
+        lists.append( "laplacian4" );
+        lists.append( "laplacian8" );
+        lists.append( "unsharp4" );
+        lists.append( "unsharp8" );
+        model->setStringList(lists);
+        ui->filter_combobox->setModel(model);
+    });
+
+    func();
 }
 
 MainWindow::~MainWindow()
@@ -212,52 +225,7 @@ void MainWindow::slotShowEvent()
 
 void MainWindow::on_image_file_list_clicked(const QModelIndex &index)
 {
-    double re[16];
-    double im[16] = {0};
-    for ( int i = 0 ; i < 16 ; ++i ) {
-        re[i] = i;
-    }
-    codex::vision::fft1d(re,im,8,1);
-    for ( int i = 0 ; i < 16 ; ++i ) {
-        qDebug() << re[i] << ":" << im[i];
-    }
-/*
-    int j = 0;
-    int n = 8;
-    int m = 0;
-    for ( int i = 0 ; i < 8 - 1; ++i ) {
-        qDebug() << " i : " << i << " , j :" << j;
-        if ( i  < j ) {
 
-        }
-        m = n >> 1;
-        while ( m <= j ) {
-            j -= m;
-            m >>= 1;
-        }
-        j += m;
-    }
-
-    int N = 8;
-    int n = N*2;
-    int j = 0;
-    int m;
-    for (int i=0 ; i<n -1; i+=2)
-    {
-        qDebug() << " i : " << (i - 1) / 2 << " , j :" << (j - 1)/2;
-        if (j > i)
-        {
-        }
-        m = n >> 1;
-        while (j>m && m>=2)
-        {
-            j -= m;
-            m >>= 1;
-        }
-        j += m;
-    }
-
-*/
     index.data().toString();
     _base_image = std::make_shared<QImage>(
                 ":/res/images/" + index.data().toString()
@@ -361,7 +329,7 @@ void MainWindow::on_pushButton_clicked()
     }
     if ( ui->filter_combobox->currentText() ==   "laplacian4" ) {
         codex::vision::detail::filter( _image , filtered , codex::vision::laplacian ,[]( double val ) -> uint8_t {
-            return static_cast<uint8_t>( abs(val));
+            return static_cast<uint8_t>( std::abs(val));
             //return codex::vision::operation< uint8_t , double >::clip( val + 128 );
         });
     }
@@ -397,4 +365,78 @@ void MainWindow::on_fft_button_clicked()
     QTConvinience::bind( ui->image_label , _image );
     FFTDialog* dlg = new FFTDialog(this , _image );
     dlg->show();
+}
+
+
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    codex::vision::image img(_image.width() , _image.height() , _image.channel());
+    if ( _image.channel() == 4 ) {
+        codex::vision::image alpha = _image.get_channel(3);
+        codex::vision::binarization( _image , img );
+        img.put_channnel( 3 , alpha );
+        QTConvinience::bind( ui->image_label , img );
+    }else{
+        codex::vision::binarization( _image , img );
+        QTConvinience::bind( ui->image_label , img );
+    }
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    KMeanDialog* dlg = new KMeanDialog(this , _image );
+    dlg->show();
+}
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    codex::vision::image gray = codex::vision::gray_scale( _image );
+    codex::vision::image sobel_img(gray.width(),gray.height());
+    codex::vision::sobel_edge(gray,sobel_img);
+
+    QTConvinience::bind( ui->image_label , sobel_img );
+}
+
+void MainWindow::on_pushButton_6_clicked()
+{
+     codex::vision::image gray = codex::vision::gray_scale( _image );
+     codex::vision::image canny_image(gray.width(),gray.height());
+     codex::vision::canny_edge( gray , canny_image , 60 , 30 );
+
+     QTConvinience::bind( ui->image_label , canny_image );
+}
+
+void MainWindow::on_pushButton_7_clicked()
+{
+    codex::vision::image gray = codex::vision::gray_scale( _image );
+
+    codex::vision::image canny_image(gray.width(),gray.height());
+    codex::vision::canny_edge( gray , canny_image , 60 , 30 );
+
+    std::vector< codex::vision::hough_line_result > res;
+
+    codex::vision::hough_line( canny_image , 100 , 200 , 1.0 , res );
+    for ( std::size_t i = 0 ; i < res.size() ; ++i ) {
+         codex::vision::line_to( canny_image , res[i].from() , res[i].to() , 0x7f );
+    }
+    QTConvinience::bind( ui->image_label , canny_image );
+
+}
+
+void MainWindow::on_pushButton_8_clicked()
+{
+    codex::vision::image gray = codex::vision::gray_scale( _image );
+    std::vector< codex::vision::point > points;
+    codex::vision::harris_corner( gray , 1e8 , 0.04 , points );
+
+    for ( std::size_t i = 0 ; i < points.size() ; ++i ) {
+        codex::vision::point p1 { points[i].x - 1 , points[i].y };
+        codex::vision::point p2 { points[i].x + 1 , points[i].y };
+        codex::vision::point p3 { points[i].x , points[i].y - 1};
+        codex::vision::point p4 { points[i].x , points[i].y + 1};
+        codex::vision::line_to( gray , p1 , p2 , 0xff );
+        codex::vision::line_to( gray , p3 , p4 , 0xff );
+    }
+    QTConvinience::bind( ui->image_label , gray );
 }

@@ -80,7 +80,7 @@ namespace codex { namespace vision {
             }
         }
 
-        image_base<typeT> get_channel( int l ) {
+        image_base<typeT> get_channel( std::size_t l ) {
             if ( l > _channel ) {
                 return image_base<typeT>();
             }
@@ -148,6 +148,30 @@ namespace codex { namespace vision {
 
         void reset( typeT val ) {
             _buffer.assign( _buffer.size() , val );
+        }
+
+        void reset_channel( std::size_t l , typeT val ){
+            if ( l >= channel())
+                return;
+            for ( std::size_t r = 0 ; r < height() ; ++r ){
+                typeT* ptr = ptr(r);
+                for ( std::size_t c = 0 ; c < width() ; ++c ) {
+                    ptr[ c * channel() + l ] = val;
+                }
+            }
+        }
+
+        void reset_channels( std::vector< typeT >& values ) {
+            for ( std::size_t r = 0 ; r < height() ; ++r ){
+                typeT* ptr = this->ptr(r);
+                for ( std::size_t c = 0 ; c < width() ; ++c ) {
+                    for ( std::size_t l = 0
+                          ; l < std::min( channel() , values.size() )
+                          ; ++l ) {
+                        ptr[ c * channel() + l ] = values[l];
+                    }
+                }
+            }
         }
 
         template < typename scalarT >

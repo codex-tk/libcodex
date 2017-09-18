@@ -61,21 +61,22 @@ namespace codex { namespace vision {
         -1.0 , -1.0 , -1.0
     };
     static codex::vision::kernel<3,3> sobel_x {
-        1.0 ,  2.0 ,  1.0 ,
-        0.0 ,  0.0 ,  0.0 ,
-       -1.0 , -2.0 , -1.0
-    };
-    static codex::vision::kernel<3,3> sobel_y {
         -1.0 ,  0.0 ,  1.0 ,
         -2.0 ,  0.0 ,  2.0 ,
         -1.0 ,  0.0 ,  1.0
     };
-    static codex::vision::kernel<3,3> prewitt_x {
+    static codex::vision::kernel<3,3> sobel_y {
+        1.0 ,  2.0 ,  1.0 ,
+        0.0 ,  0.0 ,  0.0 ,
+       -1.0 , -2.0 , -1.0
+    };
+
+    static codex::vision::kernel<3,3> prewitt_y {
          1.0 ,  1.0 ,  1.0 ,
          0.0 ,  0.0 ,  0.0 ,
         -1.0 , -1.0 , -1.0
     };
-    static codex::vision::kernel<3,3> prewitt_y {
+    static codex::vision::kernel<3,3> prewitt_x {
          1.0 ,  0.0 , -1.0 ,
          1.0 ,  0.0 , -1.0 ,
          1.0 ,  0.0 , -1.0

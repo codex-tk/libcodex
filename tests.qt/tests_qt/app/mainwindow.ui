@@ -79,6 +79,48 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_3">
+        <property name="text">
+         <string>Binarization</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_4">
+        <property name="text">
+         <string>kMEAN</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_5">
+        <property name="text">
+         <string>SobelEdge</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_6">
+        <property name="text">
+         <string>CannyEdge</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_7">
+        <property name="text">
+         <string>Hough</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_8">
+        <property name="text">
+         <string>HarrisCorner</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item row="2" column="0">
@@ -99,7 +141,7 @@
      <x>0</x>
      <y>0</y>
      <width>833</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
