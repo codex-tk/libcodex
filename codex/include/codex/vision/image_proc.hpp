@@ -241,6 +241,11 @@ namespace codex { namespace vision {
 
         for ( std::size_t r = 0 ; r < src.height() ; ++r ) {
             for ( std::size_t c = 0 ; c < src.width() ; ++c ) {
+                // 중심을 원점으로 이동
+                // 회전 적용
+                // 원점 복귀
+                // 확대 / 축소
+                // 평행 이동
                 double srcx = scale * ( cr * (c - cx) + sr * ( r -cy )) + cx - tx;
                 double srcy = scale * (-sr * (c - cx) + cr * ( r -cy )) + cy - ty;
                 if ( srcx >= 0 && srcx < src.width() && srcy >= 0 && srcy < src.height() ) {
@@ -251,7 +256,10 @@ namespace codex { namespace vision {
             }
         }
     }
-
+    /*
+    template < typename typeT >
+    void rgb_to_hsv( const image_base<typeT>& rgb , image_base<typeT>& dst )
+*/
 /*
     void _FFT1d(double* g, unsigned long N, int isign)
     {
